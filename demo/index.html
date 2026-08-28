@@ -281,13 +281,15 @@ footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var
 /* ══════════════════════════════════════════════════════════════════════════
    Le parcours.
 
-   Deux constantes à renseigner avant la mise en ligne — et tant qu'elles sont
-   vides, la page le DIT au lieu de faire semblant. Un formulaire qui avale une
-   demande en silence coûte plus cher que pas de formulaire du tout.
+   La page appelle le webhook UNE FOIS PAR TUILE, neuf fois. n8n n'a donc aucun
+   état à tenir : pas de table de jobs, pas de sondage, pas d'identifiant à
+   retrouver. Une tuile qui échoue est une image manquante, pas une génération
+   morte — et c'est la page qui compte, puisque c'est elle qui sait où elle en
+   est. Le navigateur en laisse passer six à la fois et met les autres en file :
+   comptez deux à trois minutes pour les neuf, ce que l'écran annonce.
    ══════════════════════════════════════════════════════════════════════════ */
-var LANCER   = '';   // webhook n8n qui démarre la génération  → { id }
-var ETAT     = '';   // webhook n8n qui rend l'avancement      → { pret, total, urls[] }
-var RENDEZVOUS = '';  // lien de prise de rendez-vous (Calendly ou autre)
+var TUILE = 'https://n7n.automatisationboost.com/webhook/feed-tuile';
+var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
 
 (function () {
   var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -299,7 +301,7 @@ var RENDEZVOUS = '';  // lien de prise de rendez-vous (Calendly ou autre)
   var r2 = document.getElementById('retour2');
   var grille = document.getElementById('grille');
   var compte = document.getElementById('compte');
-  var jobId = null, sondage = null, demande = {};
+  var demande = {}, urls = new Array(9).fill(null), finis = 0;
 
   var ouvrir = function (n) {
     ['e1','e2','e3'].forEach(function (id, i) {
@@ -312,8 +314,50 @@ var RENDEZVOUS = '';  // lien de prise de rendez-vous (Calendly ou autre)
   if (RENDEZVOUS) document.getElementById('rdv').href = RENDEZVOUS;
   else document.getElementById('rdv').addEventListener('click', function (e) {
     e.preventDefault();
-    alert('Lien de rendez-vous non renseigné : remplissez RENDEZVOUS dans le script.');
+    r2.textContent = '';
+    alert('Le lien de rendez-vous n’est pas encore renseigné.');
   });
+
+  var poser = function (n, url) {
+    var c = grille.children[n];
+    if (!c || c.classList.contains('prete')) return;
+    c.classList.add('prete');
+    var im = new Image(); im.src = url; im.alt = ''; c.appendChild(im);
+    urls[n] = url; finis++;
+    compte.textContent = finis;
+    if (finis >= 9) montrer();
+  };
+
+  var uneTuile = function (n) {
+    return fetch(TUILE, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({}, demande, { n: n }))
+    })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) { if (j && j.url) poser(n, j.url); else marquerRatee(n); })
+      .catch(function () { marquerRatee(n); });
+  };
+
+  /* Une tuile ratée ne doit pas figer l'écran sur « 7 sur 9 » pour toujours :
+     on la sort du compte et on affiche le feed avec ce qu'on a. */
+  var ratees = 0;
+  var marquerRatee = function (n) {
+    var c = grille.children[n];
+    if (c) c.classList.add('prete');
+    ratees++;
+    if (finis + ratees >= 9) montrer();
+  };
+
+  var montrer = function () {
+    var faits = urls.filter(Boolean);
+    if (!faits.length) { r1.textContent = 'Aucune image n’a pu être générée. Réessayez.'; ouvrir(1); return; }
+    var res = document.getElementById('resultat');
+    res.innerHTML = '';
+    faits.forEach(function (u) { var im = new Image(); im.src = u; im.alt = ''; res.appendChild(im); });
+    document.getElementById('titre-res').textContent =
+      'Voilà le compte de ' + (demande.etablissement || 'votre établissement') + '.';
+    ouvrir(3);
+  };
 
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
@@ -323,61 +367,29 @@ var RENDEZVOUS = '';  // lien de prise de rendez-vous (Calendly ou autre)
       return;
     }
     demande = Object.fromEntries(new FormData(form));
-    if (!LANCER) { r1.textContent = 'Génération non connectée : renseignez LANCER dans le script.'; return; }
-
-    lancer.disabled = true; lancer.textContent = 'On démarre…'; r1.textContent = '';
-    fetch(LANCER, { method:'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify(demande) })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (j) {
-        jobId = j.id; ouvrir(2); suivre();
-      })
-      .catch(function () {
-        r1.textContent = 'Le démarrage n’a pas abouti. Réessayez dans un instant.';
-      })
-      .then(function () { lancer.disabled = false; lancer.textContent = 'Générer mon feed'; });
+    urls = new Array(9).fill(null); finis = 0; ratees = 0;
+    compte.textContent = '0';
+    Array.prototype.forEach.call(grille.children, function (c) {
+      c.className = ''; c.innerHTML = '';
+    });
+    r1.textContent = '';
+    ouvrir(2);
+    for (var i = 0; i < 9; i++) uneTuile(i);
   });
 
-  /* On interroge l'avancement toutes les 6 s : assez souvent pour que l'écran
-     vive, assez rare pour ne pas marteler le serveur pendant trois minutes. */
-  var suivre = function () {
-    if (!ETAT || !jobId) return;
-    sondage = setInterval(function () {
-      fetch(ETAT + (ETAT.indexOf('?') < 0 ? '?' : '&') + 'id=' + encodeURIComponent(jobId))
-        .then(function (r) { return r.json(); })
-        .then(function (j) {
-          var urls = j.urls || [];
-          compte.textContent = urls.length;
-          urls.forEach(function (u, i) {
-            var c = grille.children[i];
-            if (c && !c.classList.contains('prete')) {
-              c.classList.add('prete');
-              var im = new Image(); im.src = u; im.alt = ''; c.appendChild(im);
-            }
-          });
-          if (urls.length >= (j.total || 9)) { clearInterval(sondage); montrer(urls); }
-        })
-        .catch(function () { /* une requête ratée n'arrête pas le suivi */ });
-    }, 6000);
-  };
-
-  var montrer = function (urls) {
-    var res = document.getElementById('resultat');
-    res.innerHTML = '';
-    urls.forEach(function (u) { var im = new Image(); im.src = u; im.alt=''; res.appendChild(im); });
-    document.getElementById('titre-res').textContent =
-      'Voilà le compte de ' + (demande.etablissement || 'votre établissement') + '.';
-    ouvrir(3);
-  };
-
+  /* L'échappée par email : tant qu'elle n'est pas branchée, elle le dit. Un
+     champ qui accepte une adresse sans rien en faire est pire que pas de champ. */
+  var EMAIL = '';   // webhook n8n qui génère les neuf et envoie le lien
   formMail.addEventListener('submit', function (ev) {
     ev.preventDefault();
     if (!formMail.checkValidity()) { r2.textContent = 'Il manque une adresse valide.'; return; }
-    if (!LANCER) { r2.textContent = 'Envoi non connecté : renseignez LANCER dans le script.'; return; }
+    if (!EMAIL) {
+      r2.textContent = 'L’envoi par email n’est pas encore branché — restez sur la page, les visuels arrivent.';
+      return;
+    }
     envoyer.disabled = true; envoyer.textContent = 'Envoi…';
-    fetch(LANCER, { method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(Object.assign({}, demande, {
-        email: formMail.email.value, id: jobId, action: 'prevenir' })) })
+    fetch(EMAIL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.assign({}, demande, { email: formMail.email.value })) })
       .then(function (r) { if (!r.ok) throw new Error(r.status); })
       .then(function () {
         r2.textContent = 'C’est noté. Vous recevez le lien dès que les neuf visuels sont prêts.';
