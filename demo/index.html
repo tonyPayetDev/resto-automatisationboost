@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Votre feed Instagram, en deux minutes — Food Boost</title>
+<meta name="description" content="Dites-nous trois plats. On vous montre à quoi ressemblerait votre compte Instagram. Gratuit, sans engagement.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   FOOD BOOST — la démo.
+   Charte identique à la landing : vert forêt #0d2818 / #14301c, orange
+   #E8722A, titres serif blanc, corps sans-serif clair.
+
+   Le parcours tient en trois écrans et un seul geste par écran. C'est la
+   contrainte qui a décidé de tout le reste : un restaurateur remplit ça entre
+   deux services, sur un téléphone, une main occupée.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --vert-profond:#0d2818; --vert:#14301c; --vert-clair:#1b3b25;
+  --orange:#E8722A; --orange-sombre:#c85f20;
+  --blanc:#F5F2EC; --corps:#DCE3D8; --attenue:#A9B8A6; --indice:#9AAB97;
+  --filet:rgba(245,242,236,.12);
+  --serif:"Playfair Display",Georgia,serif;
+  --sans:"Jost",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --sortie:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--vert-profond);color:var(--corps);
+  font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+::selection{background:var(--orange);color:#12100c}
+:focus-visible{outline:2px solid var(--orange);outline-offset:3px;border-radius:6px}
+html{scrollbar-color:var(--orange) var(--vert)}
+::-webkit-scrollbar{width:11px}
+::-webkit-scrollbar-track{background:var(--vert)}
+::-webkit-scrollbar-thumb{background:#2e5236;border-radius:99px;border:3px solid var(--vert)}
+img{max-width:100%;display:block}
+
+.page{max-width:660px;margin:0 auto;padding:clamp(26px,6vw,58px) clamp(20px,5vw,40px) 80px}
+
+.marque{font-family:var(--serif);font-weight:600;font-size:15px;letter-spacing:.02em;
+  color:var(--blanc);line-height:1.1;margin-bottom:clamp(26px,5vw,44px)}
+.marque em{font-style:normal;color:var(--orange)}
+
+h1{font-family:var(--serif);color:var(--blanc);font-weight:500;margin:0 0 12px;
+  font-size:clamp(30px,5.4vw,44px);line-height:1.14;letter-spacing:-.015em;text-wrap:balance}
+.chapeau{margin:0 0 clamp(28px,5vw,42px);color:var(--attenue);font-size:16px;max-width:46ch}
+
+/* ── Le fil des trois écrans ─────────────────────────────────────────── */
+.fil{display:flex;gap:8px;margin-bottom:clamp(26px,4.5vw,38px)}
+.fil i{flex:1;height:3px;border-radius:99px;background:var(--filet);
+  transition:background-color .6s var(--sortie)}
+.fil i.faite{background:var(--orange)}
+
+.ecran{display:none}
+.ecran.ouvert{display:block;animation:entre .55s var(--sortie) both}
+@keyframes entre{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ── Champs ──────────────────────────────────────────────────────────── */
+.champ{display:grid;gap:7px;margin-bottom:20px}
+.champ label{font-size:12px;letter-spacing:.11em;text-transform:uppercase;color:var(--attenue)}
+.champ label span{color:var(--orange);text-transform:none;letter-spacing:0;font-size:12.5px}
+.champ input,.plat input,.echappee input{font-family:var(--sans);font-size:16px;font-weight:300;color:var(--blanc);
+  background:var(--vert-clair);border:1px solid var(--filet);border-radius:11px;
+  padding:14px 16px;width:100%;caret-color:var(--orange);
+  transition:border-color .25s ease}
+.champ input::placeholder,.plat input::placeholder,.echappee input::placeholder{color:var(--indice)}
+.champ input:hover,.plat input:hover,.echappee input:hover{border-color:rgba(245,242,236,.24)}
+.champ input:focus,.plat input:focus,.echappee input:focus{outline:none;
+  border-color:var(--orange);box-shadow:inset 0 0 0 1px rgba(232,114,42,.45)}
+.deux{display:grid;gap:20px}
+@media(min-width:560px){.deux{grid-template-columns:1fr 1fr}}
+
+/* Les trois plats : trois lignes numérotées, pas trois champs identiques —
+   le chiffre dit qu'il en faut trois et évite la question. */
+.plats{display:grid;gap:10px;margin-bottom:20px}
+.plat{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:10px}
+.plat span{font-family:var(--serif);font-size:19px;color:var(--attenue);text-align:center}
+.plat input{margin:0}
+
+/* ── Choix du style ──────────────────────────────────────────────────── */
+.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
+.styles > *{min-width:0}
+.style{position:relative;cursor:pointer;margin:0}
+.style input{position:absolute;opacity:0;width:0;height:0}
+.style .vignette{display:block;border-radius:12px;overflow:hidden;border:2px solid transparent;
+  transition:border-color .25s ease,transform .3s var(--sortie)}
+.style img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.style .nom{display:block;margin-top:9px;text-align:center;font-size:12.5px;
+  color:var(--attenue);transition:color .25s ease}
+.style:hover .vignette{transform:translateY(-3px)}
+.style input:checked + .vignette{border-color:var(--orange)}
+.style input:checked ~ .nom{color:var(--orange)}
+.style input:focus-visible + .vignette{outline:2px solid var(--orange);outline-offset:3px}
+
+/* ── Boutons ─────────────────────────────────────────────────────────── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-family:var(--sans);font-size:16px;font-weight:500;padding:16px 30px;
+  border-radius:999px;border:1px solid transparent;cursor:pointer;text-decoration:none;
+  transition:transform .25s var(--sortie),background-color .25s ease,border-color .25s ease}
+.btn-plein{background:var(--orange);color:#12100c;width:100%;
+  box-shadow:0 8px 20px -10px rgba(0,0,0,.75)}
+.btn-plein:hover{background:#f0813c;transform:translateY(-2px)}
+.btn-plein:active{background:var(--orange-sombre);transform:none}
+.btn-ligne{border-color:rgba(232,114,42,.55);color:var(--orange);background:transparent}
+.btn-ligne:hover{border-color:var(--orange);background:rgba(232,114,42,.10)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.mention{margin:14px 0 0;font-size:13px;color:var(--attenue);text-align:center}
+
+/* ── Écran 2 : la fabrication ────────────────────────────────────────── */
+.grille-att{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+  margin:0 0 clamp(24px,4vw,34px);border-radius:12px;overflow:hidden}
+.grille-att > div{aspect-ratio:4/5;background:var(--vert-clair);position:relative;overflow:hidden}
+.grille-att > div::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent 20%,rgba(245,242,236,.07) 50%,transparent 80%);
+  transform:translateX(-100%);animation:balaye 1.9s linear infinite}
+.grille-att > div:nth-child(2)::after{animation-delay:.22s}
+.grille-att > div:nth-child(3)::after{animation-delay:.44s}
+.grille-att > div:nth-child(4)::after{animation-delay:.66s}
+.grille-att > div:nth-child(5)::after{animation-delay:.88s}
+.grille-att > div:nth-child(6)::after{animation-delay:1.1s}
+.grille-att > div:nth-child(7)::after{animation-delay:1.32s}
+.grille-att > div:nth-child(8)::after{animation-delay:1.54s}
+.grille-att > div:nth-child(9)::after{animation-delay:1.76s}
+@keyframes balaye{to{transform:translateX(100%)}}
+.grille-att > div.prete::after{display:none}
+.grille-att img{width:100%;height:100%;object-fit:cover;
+  animation:entre .6s var(--sortie) both}
+.compte{font-variant-numeric:tabular-nums;color:var(--orange);font-weight:500}
+
+.echappee{background:var(--vert);border:1px solid var(--filet);border-radius:14px;
+  padding:22px clamp(18px,4vw,26px);margin-top:clamp(24px,4vw,34px)}
+.echappee h2{font-family:var(--serif);color:var(--blanc);font-weight:500;
+  font-size:19px;margin:0 0 6px}
+.echappee p{margin:0 0 16px;font-size:14px;color:var(--attenue)}
+.echappee .ligne{display:grid;gap:10px}
+@media(min-width:520px){.echappee .ligne{grid-template-columns:1fr auto}}
+.echappee input{margin:0}
+.echappee .btn{width:auto;white-space:nowrap;padding-inline:24px}
+
+/* ── Écran 3 : le résultat ───────────────────────────────────────────── */
+.grille-res{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+  border-radius:12px;overflow:hidden;margin-bottom:clamp(24px,4vw,34px)}
+.grille-res > *{min-width:0}
+.grille-res img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.suite{background:var(--vert);border:1px solid rgba(232,114,42,.3);border-radius:16px;
+  padding:clamp(22px,4vw,32px);text-align:center}
+.suite h2{font-family:var(--serif);color:var(--blanc);font-weight:500;
+  font-size:clamp(21px,3.4vw,27px);margin:0 0 10px;line-height:1.3}
+.suite p{margin:0 0 20px;font-size:14.5px;color:var(--attenue);max-width:44ch;
+  margin-inline:auto}
+.suite .btn-plein{width:auto;padding-inline:32px}
+.suite .apres{margin:16px 0 0;font-size:13px;color:var(--attenue)}
+
+.retour{margin:16px 0 0;text-align:center;font-size:14px;color:var(--orange);min-height:1.3em}
+
+footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var(--filet);
+  font-size:12.5px;color:var(--attenue);text-align:center}
+
+@media(prefers-reduced-motion:reduce){
+  .ecran.ouvert{animation:none}
+  .grille-att > div::after{animation:none}
+  .grille-att img{animation:none}
+  .btn:hover,.style:hover .vignette{transform:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="marque">FOOD<br>BOOST <em>🌿</em></div>
+
+  <div class="fil" aria-hidden="true"><i id="f1" class="faite"></i><i id="f2"></i><i id="f3"></i></div>
+
+  <!-- ══ Écran 1 — ce qu'on sert ══ -->
+  <section class="ecran ouvert" id="e1">
+    <h1>Dites-nous trois plats. On vous montre votre compte.</h1>
+    <p class="chapeau">Pas de compte à créer, rien à installer. Deux minutes, et vous voyez à quoi
+      ressemblerait votre Instagram si quelqu'un s'en occupait.</p>
+
+    <form id="form">
+      <div class="deux">
+        <div class="champ">
+          <label for="etab">Nom de l'établissement</label>
+          <input id="etab" name="etablissement" type="text" required autocomplete="organization"
+                 placeholder="Chez Marie">
+        </div>
+        <div class="champ">
+          <label for="ville">Ville</label>
+          <input id="ville" name="ville" type="text" required autocomplete="address-level2"
+                 placeholder="Saint-Denis">
+        </div>
+      </div>
+
+      <div class="champ" style="margin-bottom:10px">
+        <label>Trois plats que vous servez <span>— ceux dont vous êtes fier</span></label>
+      </div>
+      <div class="plats">
+        <div class="plat"><span>1</span><input name="plat1" type="text" required placeholder="Cari poulet"></div>
+        <div class="plat"><span>2</span><input name="plat2" type="text" required placeholder="Rougail saucisse"></div>
+        <div class="plat"><span>3</span><input name="plat3" type="text" required placeholder="Gâteau patate"></div>
+      </div>
+
+      <div class="champ" style="margin-bottom:12px">
+        <label>Le style qui vous ressemble</label>
+      </div>
+      <div class="styles">
+        <label class="style">
+          <input type="radio" name="style" value="creole" checked>
+          <span class="vignette"><img src="styles/creole.jpg" alt="Style créole : vert profond, doré, feuillage tropical"></span>
+          <span class="nom">Créole</span>
+        </label>
+        <label class="style">
+          <input type="radio" name="style" value="elegant">
+          <span class="vignette"><img src="styles/elegant.jpg" alt="Style élégant : noir profond, serif fine, lumière basse"></span>
+          <span class="nom">Élégant</span>
+        </label>
+        <label class="style">
+          <input type="radio" name="style" value="franc">
+          <span class="vignette"><img src="styles/franc.jpg" alt="Style franc : aplat orange, typographie lourde"></span>
+          <span class="nom">Franc</span>
+        </label>
+      </div>
+
+      <button class="btn btn-plein" type="submit" id="lancer">Générer mon feed</button>
+      <p class="mention">Gratuit, sans engagement. On n'invente ni vos prix, ni vos horaires,
+        ni vos avis.</p>
+      <p class="retour" id="retour1" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <!-- ══ Écran 2 — la fabrication ══ -->
+  <section class="ecran" id="e2">
+    <h1>On fabrique votre feed.</h1>
+    <p class="chapeau"><span class="compte" id="compte">0</span> visuel sur 9 — comptez deux à
+      trois minutes. Vous pouvez rester, l'écran se remplit tout seul.</p>
+
+    <div class="grille-att" id="grille">
+      <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    </div>
+
+    <!-- L'échappée. Elle n'est pas cachée derrière un lien : c'est la moitié des
+         gens, et leur demander de patienter sans issue, c'est les perdre. -->
+    <div class="echappee">
+      <h2>Pas le temps d'attendre ?</h2>
+      <p>Laissez votre email : on vous envoie le lien dès que c'est prêt. Vous pouvez fermer
+        cette page.</p>
+      <form class="ligne" id="form-mail">
+        <input type="email" name="email" required autocomplete="email" placeholder="vous@votre-resto.fr">
+        <button class="btn btn-ligne" type="submit" id="envoyer">Envoyez-le moi</button>
+      </form>
+      <p class="retour" id="retour2" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <!-- ══ Écran 3 — le résultat ══ -->
+  <section class="ecran" id="e3">
+    <h1 id="titre-res">Voilà votre compte.</h1>
+    <p class="chapeau">Neuf visuels, faits avec vos plats. Aucun prix, aucun horaire, aucun avis
+      n'a été inventé.</p>
+
+    <div class="grille-res" id="resultat"></div>
+
+    <div class="suite">
+      <h2>On les publie sur votre compte ?</h2>
+      <p>Ces neuf visuels sont prêts à partir. Pour qu'ils se publient sur VOTRE Instagram, il
+        faut connecter votre compte une fois — c'est un appel de quinze minutes, avec moi.</p>
+      <a class="btn btn-plein" id="rdv" href="#" target="_blank" rel="noopener">Réserver l'appel</a>
+      <p class="apres">Quinze minutes. Si ça ne vous convient pas, vous gardez les visuels.</p>
+    </div>
+  </section>
+
+  <footer>Food Boost — La Réunion. Vos visuels vous appartiennent.</footer>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   Le parcours.
+
+   Deux constantes à renseigner avant la mise en ligne — et tant qu'elles sont
+   vides, la page le DIT au lieu de faire semblant. Un formulaire qui avale une
+   demande en silence coûte plus cher que pas de formulaire du tout.
+   ══════════════════════════════════════════════════════════════════════════ */
+var LANCER   = '';   // webhook n8n qui démarre la génération  → { id }
+var ETAT     = '';   // webhook n8n qui rend l'avancement      → { pret, total, urls[] }
+var RENDEZVOUS = '';  // lien de prise de rendez-vous (Calendly ou autre)
+
+(function () {
+  var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var form = document.getElementById('form');
+  var formMail = document.getElementById('form-mail');
+  var lancer = document.getElementById('lancer');
+  var envoyer = document.getElementById('envoyer');
+  var r1 = document.getElementById('retour1');
+  var r2 = document.getElementById('retour2');
+  var grille = document.getElementById('grille');
+  var compte = document.getElementById('compte');
+  var jobId = null, sondage = null, demande = {};
+
+  var ouvrir = function (n) {
+    ['e1','e2','e3'].forEach(function (id, i) {
+      document.getElementById(id).classList.toggle('ouvert', i === n - 1);
+      document.getElementById('f' + (i + 1)).classList.toggle('faite', i < n);
+    });
+    window.scrollTo({ top: 0, behavior: reduit ? 'auto' : 'smooth' });
+  };
+
+  if (RENDEZVOUS) document.getElementById('rdv').href = RENDEZVOUS;
+  else document.getElementById('rdv').addEventListener('click', function (e) {
+    e.preventDefault();
+    alert('Lien de rendez-vous non renseigné : remplissez RENDEZVOUS dans le script.');
+  });
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    if (!form.checkValidity()) {
+      r1.textContent = 'Il manque un champ — vérifiez les lignes ci-dessus.';
+      var premier = form.querySelector(':invalid'); if (premier) premier.focus();
+      return;
+    }
+    demande = Object.fromEntries(new FormData(form));
+    if (!LANCER) { r1.textContent = 'Génération non connectée : renseignez LANCER dans le script.'; return; }
+
+    lancer.disabled = true; lancer.textContent = 'On démarre…'; r1.textContent = '';
+    fetch(LANCER, { method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify(demande) })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (j) {
+        jobId = j.id; ouvrir(2); suivre();
+      })
+      .catch(function () {
+        r1.textContent = 'Le démarrage n’a pas abouti. Réessayez dans un instant.';
+      })
+      .then(function () { lancer.disabled = false; lancer.textContent = 'Générer mon feed'; });
+  });
+
+  /* On interroge l'avancement toutes les 6 s : assez souvent pour que l'écran
+     vive, assez rare pour ne pas marteler le serveur pendant trois minutes. */
+  var suivre = function () {
+    if (!ETAT || !jobId) return;
+    sondage = setInterval(function () {
+      fetch(ETAT + (ETAT.indexOf('?') < 0 ? '?' : '&') + 'id=' + encodeURIComponent(jobId))
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          var urls = j.urls || [];
+          compte.textContent = urls.length;
+          urls.forEach(function (u, i) {
+            var c = grille.children[i];
+            if (c && !c.classList.contains('prete')) {
+              c.classList.add('prete');
+              var im = new Image(); im.src = u; im.alt = ''; c.appendChild(im);
+            }
+          });
+          if (urls.length >= (j.total || 9)) { clearInterval(sondage); montrer(urls); }
+        })
+        .catch(function () { /* une requête ratée n'arrête pas le suivi */ });
+    }, 6000);
+  };
+
+  var montrer = function (urls) {
+    var res = document.getElementById('resultat');
+    res.innerHTML = '';
+    urls.forEach(function (u) { var im = new Image(); im.src = u; im.alt=''; res.appendChild(im); });
+    document.getElementById('titre-res').textContent =
+      'Voilà le compte de ' + (demande.etablissement || 'votre établissement') + '.';
+    ouvrir(3);
+  };
+
+  formMail.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    if (!formMail.checkValidity()) { r2.textContent = 'Il manque une adresse valide.'; return; }
+    if (!LANCER) { r2.textContent = 'Envoi non connecté : renseignez LANCER dans le script.'; return; }
+    envoyer.disabled = true; envoyer.textContent = 'Envoi…';
+    fetch(LANCER, { method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(Object.assign({}, demande, {
+        email: formMail.email.value, id: jobId, action: 'prevenir' })) })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); })
+      .then(function () {
+        r2.textContent = 'C’est noté. Vous recevez le lien dès que les neuf visuels sont prêts.';
+        formMail.reset();
+      })
+      .catch(function () { r2.textContent = 'L’envoi n’a pas abouti. Réessayez.'; })
+      .then(function () { envoyer.disabled = false; envoyer.textContent = 'Envoyez-le moi'; });
+  });
+})();
+</script>
+</body>
+</html>
