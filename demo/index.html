@@ -112,18 +112,49 @@ h1{font-family:var(--serif);color:var(--blanc);font-weight:500;margin:0 0 12px;
 .mention{margin:14px 0 0;font-size:13px;color:var(--attenue);text-align:center}
 
 
-/* ── Écran 2 : l'attente d'UNE image ─────────────────────────────────── */
-.attente{position:relative;aspect-ratio:9/16;max-width:340px;margin:0 auto clamp(24px,4vw,34px);
-  background:var(--vert-clair);border-radius:14px;overflow:hidden;border:1px solid var(--filet)}
-.attente .lueur{position:absolute;inset:0;
+/* ── Le profil : en-tête et stories en HTML, tuiles générées ──────────
+   Une seule image contenant les neuf cases donne ~230 px par case : le modèle
+   y dessine neuf miniatures et la typographie bave. Les tuiles sont donc
+   générées une par une, en pleine résolution, et c'est NOUS qui composons
+   l'en-tête — la typo y est nette, et rien n'y est inventé. */
+.profil{max-width:380px;margin:0 auto clamp(26px,4vw,38px);background:var(--vert-clair);
+  border:1px solid var(--filet);border-radius:16px;overflow:hidden;
+  box-shadow:0 30px 60px -40px rgba(0,0,0,.95)}
+.profil-tete{display:flex;align-items:center;gap:14px;padding:18px 18px 12px}
+.pastille{flex:0 0 58px;width:58px;height:58px;border-radius:50%;display:grid;
+  place-items:center;background:var(--orange);color:#12100c;
+  font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:.02em}
+.profil-id{min-width:0}
+.profil-id strong{display:block;color:var(--blanc);font-weight:500;font-size:16px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profil-id span{display:block;font-size:13px;color:var(--attenue);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stories{display:flex;gap:12px;padding:6px 18px 16px;overflow-x:auto;
+  scrollbar-width:none}
+.stories::-webkit-scrollbar{display:none}
+.stories i{flex:0 0 auto;display:grid;place-items:center;width:52px;
+  font-size:10px;letter-spacing:.06em;color:var(--attenue);font-style:normal;
+  text-align:center;gap:6px}
+.stories i::before{content:"";width:46px;height:46px;border-radius:50%;
+  background:var(--vert);border:1.5px solid rgba(232,114,42,.5)}
+.grille9{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--vert)}
+.grille9 > div{aspect-ratio:4/5;background:var(--vert-clair);position:relative;overflow:hidden}
+.grille9 > div::after{content:"";position:absolute;inset:0;
   background:linear-gradient(100deg,transparent 20%,rgba(245,242,236,.08) 50%,transparent 80%);
   transform:translateX(-100%);animation:balaye 1.9s linear infinite}
+.grille9 > div:nth-child(2)::after{animation-delay:.2s}
+.grille9 > div:nth-child(3)::after{animation-delay:.4s}
+.grille9 > div:nth-child(4)::after{animation-delay:.6s}
+.grille9 > div:nth-child(5)::after{animation-delay:.8s}
+.grille9 > div:nth-child(6)::after{animation-delay:1s}
+.grille9 > div:nth-child(7)::after{animation-delay:1.2s}
+.grille9 > div:nth-child(8)::after{animation-delay:1.4s}
+.grille9 > div:nth-child(9)::after{animation-delay:1.6s}
+.grille9 > div.prete::after{display:none}
+.grille9 img{width:100%;height:100%;object-fit:cover;animation:entre .6s var(--sortie) both}
 @keyframes balaye{to{transform:translateX(100%)}}
 
 /* ── Écran 3 : l'aperçu, le choix, le post ───────────────────────────── */
-.apercu{max-width:360px;margin:0 auto clamp(30px,5vw,44px)}
-.apercu img{width:100%;border-radius:14px;border:1px solid var(--filet);
-  box-shadow:0 30px 60px -40px rgba(0,0,0,.95)}
 .choisir{background:var(--vert);border:1px solid var(--filet);border-radius:16px;
   padding:clamp(20px,4vw,30px);margin-bottom:clamp(24px,4vw,34px)}
 .choisir h2{font-family:var(--serif);color:var(--blanc);font-weight:500;
@@ -266,13 +297,25 @@ footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var
     </form>
   </section>
 
-  <!-- ══ Écran 2 — la fabrication de l'aperçu ══ -->
+  <!-- ══ Écran 2 — les neuf tuiles arrivent dans le profil ══ -->
   <section class="ecran" id="e2">
     <h1>On fabrique votre compte.</h1>
-    <p class="chapeau">Une image de votre profil entier, avec vos plats. Comptez une minute
-      et demie — l'écran se met à jour tout seul.</p>
+    <p class="chapeau"><span class="compte" id="compte">0</span> visuel sur 9 — deux à trois
+      minutes. Chaque tuile est générée en pleine résolution ; l'écran se remplit tout seul.</p>
 
-    <div class="attente" id="attente"><div class="lueur"></div></div>
+    <div class="profil" id="profil">
+      <div class="profil-tete">
+        <div class="pastille" id="pastille"></div>
+        <div class="profil-id">
+          <strong id="pNom">Votre établissement</strong>
+          <span id="pBio">Restaurant</span>
+        </div>
+      </div>
+      <div class="stories" id="stories"></div>
+      <div class="grille9" id="grille">
+        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+      </div>
+    </div>
 
     <div class="echappee">
       <h2>Pas le temps d'attendre&nbsp;?</h2>
@@ -286,13 +329,13 @@ footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var
     </div>
   </section>
 
-  <!-- ══ Écran 3 — l'aperçu, puis le post que la personne choisit ══ -->
+  <!-- ══ Écran 3 — le compte, puis le post que la personne choisit ══ -->
   <section class="ecran" id="e3">
     <h1 id="titre-res">Voilà votre compte.</h1>
     <p class="chapeau">Aucun prix, aucun horaire, aucun avis n'a été inventé. Ce que vous avez
       écrit est ce qui s'affiche.</p>
 
-    <div class="apercu"><img id="imgApercu" alt="Aperçu du profil Instagram généré"></div>
+    <div class="profil" id="profilFinal"></div>
 
     <div class="choisir">
       <h2>Maintenant, choisissez un post à générer</h2>
@@ -325,12 +368,14 @@ footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var
 /* ══════════════════════════════════════════════════════════════════════════
    Le parcours, en trois écrans.
 
-   1. Le formulaire.
-   2. UNE image : le profil entier. Pas neuf fichiers — un restaurateur veut
-      voir son compte, pas une liste de visuels. Neuf fois moins cher, trois
-      fois plus rapide.
-   3. L'aperçu, puis la personne CHOISIT un type de post et on n'en génère
-      qu'un, en grand. Elle peut en refaire un autre.
+   Les neuf tuiles sont générées UNE PAR UNE, en pleine résolution, et posées
+   dans un profil dont l'en-tête et les stories sont écrits en HTML. Demander
+   au modèle de dessiner le profil entier dans une seule image donnait ~230 px
+   par case : neuf miniatures grossières et une typographie qui bave. Ici la
+   typo de l'en-tête est nette, et elle ne peut rien inventer.
+
+   Le navigateur laisse passer six requêtes à la fois et met les autres en
+   file : comptez deux à trois minutes pour les neuf.
    ══════════════════════════════════════════════════════════════════════════ */
 var MOTEUR = 'https://n7n.automatisationboost.com/webhook/feed-tuile';
 var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
@@ -339,13 +384,14 @@ var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
   var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var form = document.getElementById('form');
   var formMail = document.getElementById('form-mail');
-  var lancer = document.getElementById('lancer');
   var envoyer = document.getElementById('envoyer');
   var genPost = document.getElementById('genPost');
   var r1 = document.getElementById('retour1');
   var r2 = document.getElementById('retour2');
   var r3 = document.getElementById('retour3');
-  var demande = {};
+  var grille = document.getElementById('grille');
+  var compte = document.getElementById('compte');
+  var demande = {}, urls = new Array(9).fill(null), finis = 0, ratees = 0;
 
   var ouvrir = function (n) {
     ['e1','e2','e3'].forEach(function (id, i) {
@@ -368,6 +414,64 @@ var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
     }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
   };
 
+  /* L'en-tête du profil : leurs mots, pas les nôtres. Les initiales tiennent
+     lieu de logo tant qu'ils ne nous en ont pas donné un — inventer un
+     emblème serait leur mettre une marque qui n'est pas la leur. */
+  var poserTete = function () {
+    var nom = demande.etablissement || 'Votre établissement';
+    document.getElementById('pNom').textContent = nom;
+    document.getElementById('pBio').textContent =
+      (demande.ville ? demande.ville + ' · ' : '') + [demande.plat1, demande.plat2, demande.plat3]
+        .filter(Boolean).join(' · ');
+    document.getElementById('pastille').textContent =
+      nom.split(/\s+/).filter(Boolean).slice(0, 2).map(function (m) { return m[0]; }).join('').toUpperCase();
+    var st = document.getElementById('stories');
+    st.innerHTML = '';
+    [demande.plat1, demande.plat2, demande.plat3, 'Ambiance', 'Coulisses', 'Avis']
+      .filter(Boolean).forEach(function (t) {
+        var i = document.createElement('i'); i.textContent = String(t).slice(0, 10); st.appendChild(i);
+      });
+  };
+
+  var poser = function (n, url) {
+    var c = grille.children[n];
+    if (!c || c.classList.contains('prete')) return;
+    c.classList.add('prete');
+    var im = new Image(); im.src = url; im.alt = ''; c.appendChild(im);
+    urls[n] = url; finis++;
+    compte.textContent = finis;
+    if (finis + ratees >= 9) montrer();
+  };
+
+  /* Une tuile ratée sort du compte : sinon l'écran reste figé sur « 7 sur 9 »
+     pour toujours et le visiteur ne voit jamais son feed. */
+  var marquerRatee = function (n) {
+    var c = grille.children[n];
+    if (c) { c.classList.add('prete'); c.style.opacity = '.35'; }
+    ratees++;
+    if (finis + ratees >= 9) montrer();
+  };
+
+  var uneTuile = function (n) {
+    return appeler({ mode: 'tuile', n: n })
+      .then(function (j) { if (j && j.url) poser(n, j.url); else marquerRatee(n); })
+      .catch(function () { marquerRatee(n); });
+  };
+
+  var montre = false;
+  var montrer = function () {
+    if (montre) return; montre = true;
+    if (!urls.filter(Boolean).length) {
+      r1.textContent = 'Aucune image n’a pu être générée. Réessayez.'; ouvrir(1); return;
+    }
+    /* On déplace le profil entier sur l'écran 3 : mêmes tuiles, aucun
+       rechargement, donc aucune image qui clignote. */
+    document.getElementById('profilFinal').innerHTML = document.getElementById('profil').innerHTML;
+    document.getElementById('titre-res').textContent =
+      'Voilà le compte de ' + (demande.etablissement || 'votre établissement') + '.';
+    ouvrir(3);
+  };
+
   form.addEventListener('submit', function (ev) {
     ev.preventDefault();
     if (!form.checkValidity()) {
@@ -377,23 +481,15 @@ var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
     }
     demande = Object.fromEntries(new FormData(form));
     delete demande.typepost;
+    urls = new Array(9).fill(null); finis = 0; ratees = 0; montre = false;
+    compte.textContent = '0';
+    Array.prototype.forEach.call(grille.children, function (c) { c.className = ''; c.innerHTML = ''; c.style.opacity = ''; });
     r1.textContent = '';
+    poserTete();
     ouvrir(2);
-    appeler({ mode: 'apercu' })
-      .then(function (j) {
-        if (!j || !j.url) throw new Error('pas d’URL');
-        document.getElementById('imgApercu').src = j.url;
-        document.getElementById('titre-res').textContent =
-          'Voilà le compte de ' + (demande.etablissement || 'votre établissement') + '.';
-        ouvrir(3);
-      })
-      .catch(function () {
-        r1.textContent = 'La génération n’a pas abouti. Réessayez dans un instant.';
-        ouvrir(1);
-      });
+    for (var i = 0; i < 9; i++) uneTuile(i);
   });
 
-  /* Le post : un seul, celui que la personne a choisi. */
   genPost.addEventListener('click', function () {
     var choisi = document.querySelector('input[name="typepost"]:checked');
     var type = choisi ? choisi.value : 'plat';
@@ -416,14 +512,12 @@ var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
       .then(function () { genPost.disabled = false; genPost.textContent = 'Générer ce post'; });
   });
 
-  /* L'échappée par email : tant qu'elle n'est pas branchée, elle le dit. Un
-     champ qui accepte une adresse sans rien en faire est pire que pas de champ. */
   var EMAIL = '';
   formMail.addEventListener('submit', function (ev) {
     ev.preventDefault();
     if (!formMail.checkValidity()) { r2.textContent = 'Il manque une adresse valide.'; return; }
     if (!EMAIL) {
-      r2.textContent = 'L’envoi par email n’est pas encore branché — restez sur la page, l’aperçu arrive.';
+      r2.textContent = 'L’envoi par email n’est pas encore branché — restez sur la page, les visuels arrivent.';
       return;
     }
     envoyer.disabled = true; envoyer.textContent = 'Envoi…';
