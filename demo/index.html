@@ -111,7 +111,40 @@ h1{font-family:var(--serif);color:var(--blanc);font-weight:500;margin:0 0 12px;
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
 .mention{margin:14px 0 0;font-size:13px;color:var(--attenue);text-align:center}
 
-/* ── Écran 2 : la fabrication ────────────────────────────────────────── */
+
+/* ── Écran 2 : l'attente d'UNE image ─────────────────────────────────── */
+.attente{position:relative;aspect-ratio:9/16;max-width:340px;margin:0 auto clamp(24px,4vw,34px);
+  background:var(--vert-clair);border-radius:14px;overflow:hidden;border:1px solid var(--filet)}
+.attente .lueur{position:absolute;inset:0;
+  background:linear-gradient(100deg,transparent 20%,rgba(245,242,236,.08) 50%,transparent 80%);
+  transform:translateX(-100%);animation:balaye 1.9s linear infinite}
+@keyframes balaye{to{transform:translateX(100%)}}
+
+/* ── Écran 3 : l'aperçu, le choix, le post ───────────────────────────── */
+.apercu{max-width:360px;margin:0 auto clamp(30px,5vw,44px)}
+.apercu img{width:100%;border-radius:14px;border:1px solid var(--filet);
+  box-shadow:0 30px 60px -40px rgba(0,0,0,.95)}
+.choisir{background:var(--vert);border:1px solid var(--filet);border-radius:16px;
+  padding:clamp(20px,4vw,30px);margin-bottom:clamp(24px,4vw,34px)}
+.choisir h2{font-family:var(--serif);color:var(--blanc);font-weight:500;
+  font-size:clamp(19px,2.8vw,24px);margin:0 0 6px;line-height:1.3}
+.choisir > p{margin:0 0 18px;font-size:14px;color:var(--attenue)}
+.types{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:20px}
+.typ{cursor:pointer;margin:0}
+.typ input{position:absolute;opacity:0;width:0;height:0}
+.typ span{display:inline-block;padding:10px 17px;border-radius:999px;font-size:14px;
+  color:var(--corps);background:var(--vert-clair);border:1px solid var(--filet);
+  transition:border-color .25s ease,color .25s ease,background-color .25s ease}
+.typ:hover span{border-color:rgba(245,242,236,.28)}
+.typ input:checked + span{border-color:var(--orange);color:var(--orange);
+  background:rgba(232,114,42,.10)}
+.typ input:focus-visible + span{outline:2px solid var(--orange);outline-offset:3px}
+.post{margin-top:20px;max-width:300px}
+.post img{width:100%;border-radius:12px;border:1px solid var(--filet)}
+.post.travail{aspect-ratio:4/5;background:var(--vert-clair);border-radius:12px;
+  border:1px solid var(--filet);position:relative;overflow:hidden}
+
+/* ── anciens styles d'écran, conservés pour la suite ───────────────── */
 .grille-att{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
   margin:0 0 clamp(24px,4vw,34px);border-radius:12px;overflow:hidden}
 .grille-att > div{aspect-ratio:4/5;background:var(--vert-clair);position:relative;overflow:hidden}
@@ -233,20 +266,16 @@ footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var
     </form>
   </section>
 
-  <!-- ══ Écran 2 — la fabrication ══ -->
+  <!-- ══ Écran 2 — la fabrication de l'aperçu ══ -->
   <section class="ecran" id="e2">
-    <h1>On fabrique votre feed.</h1>
-    <p class="chapeau"><span class="compte" id="compte">0</span> visuel sur 9 — comptez deux à
-      trois minutes. Vous pouvez rester, l'écran se remplit tout seul.</p>
+    <h1>On fabrique votre compte.</h1>
+    <p class="chapeau">Une image de votre profil entier, avec vos plats. Comptez une minute
+      et demie — l'écran se met à jour tout seul.</p>
 
-    <div class="grille-att" id="grille">
-      <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-    </div>
+    <div class="attente" id="attente"><div class="lueur"></div></div>
 
-    <!-- L'échappée. Elle n'est pas cachée derrière un lien : c'est la moitié des
-         gens, et leur demander de patienter sans issue, c'est les perdre. -->
     <div class="echappee">
-      <h2>Pas le temps d'attendre ?</h2>
+      <h2>Pas le temps d'attendre&nbsp;?</h2>
       <p>Laissez votre email : on vous envoie le lien dès que c'est prêt. Vous pouvez fermer
         cette page.</p>
       <form class="ligne" id="form-mail">
@@ -257,18 +286,33 @@ footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var
     </div>
   </section>
 
-  <!-- ══ Écran 3 — le résultat ══ -->
+  <!-- ══ Écran 3 — l'aperçu, puis le post que la personne choisit ══ -->
   <section class="ecran" id="e3">
     <h1 id="titre-res">Voilà votre compte.</h1>
-    <p class="chapeau">Neuf visuels, faits avec vos plats. Aucun prix, aucun horaire, aucun avis
-      n'a été inventé.</p>
+    <p class="chapeau">Aucun prix, aucun horaire, aucun avis n'a été inventé. Ce que vous avez
+      écrit est ce qui s'affiche.</p>
 
-    <div class="grille-res" id="resultat"></div>
+    <div class="apercu"><img id="imgApercu" alt="Aperçu du profil Instagram généré"></div>
+
+    <div class="choisir">
+      <h2>Maintenant, choisissez un post à générer</h2>
+      <p>Un seul, en grand, prêt à publier. Vous pouvez en refaire un autre après.</p>
+      <div class="types">
+        <label class="typ"><input type="radio" name="typepost" value="plat" checked><span>Le plat du jour</span></label>
+        <label class="typ"><input type="radio" name="typepost" value="coulisses"><span>Les coulisses</span></label>
+        <label class="typ"><input type="radio" name="typepost" value="salle"><span>La salle, le soir</span></label>
+        <label class="typ"><input type="radio" name="typepost" value="carte"><span>Une carte à votre nom</span></label>
+        <label class="typ"><input type="radio" name="typepost" value="story"><span>Une story</span></label>
+      </div>
+      <button class="btn btn-plein" id="genPost">Générer ce post</button>
+      <p class="retour" id="retour3" role="status" aria-live="polite"></p>
+      <div class="post" id="zonePost" hidden><img id="imgPost" alt="Post généré"></div>
+    </div>
 
     <div class="suite">
-      <h2>On les publie sur votre compte ?</h2>
-      <p>Ces neuf visuels sont prêts à partir. Pour qu'ils se publient sur VOTRE Instagram, il
-        faut connecter votre compte une fois — c'est un appel de quinze minutes, avec moi.</p>
+      <h2>On les publie sur votre compte&nbsp;?</h2>
+      <p>Pour que ces visuels partent sur VOTRE Instagram, il faut connecter votre compte une
+        fois — c'est un appel de quinze minutes, avec moi.</p>
       <a class="btn btn-plein" id="rdv" href="#" target="_blank" rel="noopener">Réserver l'appel</a>
       <p class="apres">Quinze minutes. Si ça ne vous convient pas, vous gardez les visuels.</p>
     </div>
@@ -279,16 +323,16 @@ footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var
 
 <script>
 /* ══════════════════════════════════════════════════════════════════════════
-   Le parcours.
+   Le parcours, en trois écrans.
 
-   La page appelle le webhook UNE FOIS PAR TUILE, neuf fois. n8n n'a donc aucun
-   état à tenir : pas de table de jobs, pas de sondage, pas d'identifiant à
-   retrouver. Une tuile qui échoue est une image manquante, pas une génération
-   morte — et c'est la page qui compte, puisque c'est elle qui sait où elle en
-   est. Le navigateur en laisse passer six à la fois et met les autres en file :
-   comptez deux à trois minutes pour les neuf, ce que l'écran annonce.
+   1. Le formulaire.
+   2. UNE image : le profil entier. Pas neuf fichiers — un restaurateur veut
+      voir son compte, pas une liste de visuels. Neuf fois moins cher, trois
+      fois plus rapide.
+   3. L'aperçu, puis la personne CHOISIT un type de post et on n'en génère
+      qu'un, en grand. Elle peut en refaire un autre.
    ══════════════════════════════════════════════════════════════════════════ */
-var TUILE = 'https://n7n.automatisationboost.com/webhook/feed-tuile';
+var MOTEUR = 'https://n7n.automatisationboost.com/webhook/feed-tuile';
 var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
 
 (function () {
@@ -297,11 +341,11 @@ var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
   var formMail = document.getElementById('form-mail');
   var lancer = document.getElementById('lancer');
   var envoyer = document.getElementById('envoyer');
+  var genPost = document.getElementById('genPost');
   var r1 = document.getElementById('retour1');
   var r2 = document.getElementById('retour2');
-  var grille = document.getElementById('grille');
-  var compte = document.getElementById('compte');
-  var demande = {}, urls = new Array(9).fill(null), finis = 0;
+  var r3 = document.getElementById('retour3');
+  var demande = {};
 
   var ouvrir = function (n) {
     ['e1','e2','e3'].forEach(function (id, i) {
@@ -314,49 +358,14 @@ var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
   if (RENDEZVOUS) document.getElementById('rdv').href = RENDEZVOUS;
   else document.getElementById('rdv').addEventListener('click', function (e) {
     e.preventDefault();
-    r2.textContent = '';
     alert('Le lien de rendez-vous n’est pas encore renseigné.');
   });
 
-  var poser = function (n, url) {
-    var c = grille.children[n];
-    if (!c || c.classList.contains('prete')) return;
-    c.classList.add('prete');
-    var im = new Image(); im.src = url; im.alt = ''; c.appendChild(im);
-    urls[n] = url; finis++;
-    compte.textContent = finis;
-    if (finis >= 9) montrer();
-  };
-
-  var uneTuile = function (n) {
-    return fetch(TUILE, {
+  var appeler = function (extra) {
+    return fetch(MOTEUR, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.assign({}, demande, { n: n }))
-    })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (j) { if (j && j.url) poser(n, j.url); else marquerRatee(n); })
-      .catch(function () { marquerRatee(n); });
-  };
-
-  /* Une tuile ratée ne doit pas figer l'écran sur « 7 sur 9 » pour toujours :
-     on la sort du compte et on affiche le feed avec ce qu'on a. */
-  var ratees = 0;
-  var marquerRatee = function (n) {
-    var c = grille.children[n];
-    if (c) c.classList.add('prete');
-    ratees++;
-    if (finis + ratees >= 9) montrer();
-  };
-
-  var montrer = function () {
-    var faits = urls.filter(Boolean);
-    if (!faits.length) { r1.textContent = 'Aucune image n’a pu être générée. Réessayez.'; ouvrir(1); return; }
-    var res = document.getElementById('resultat');
-    res.innerHTML = '';
-    faits.forEach(function (u) { var im = new Image(); im.src = u; im.alt = ''; res.appendChild(im); });
-    document.getElementById('titre-res').textContent =
-      'Voilà le compte de ' + (demande.etablissement || 'votre établissement') + '.';
-    ouvrir(3);
+      body: JSON.stringify(Object.assign({}, demande, extra))
+    }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
   };
 
   form.addEventListener('submit', function (ev) {
@@ -367,34 +376,61 @@ var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
       return;
     }
     demande = Object.fromEntries(new FormData(form));
-    urls = new Array(9).fill(null); finis = 0; ratees = 0;
-    compte.textContent = '0';
-    Array.prototype.forEach.call(grille.children, function (c) {
-      c.className = ''; c.innerHTML = '';
-    });
+    delete demande.typepost;
     r1.textContent = '';
     ouvrir(2);
-    for (var i = 0; i < 9; i++) uneTuile(i);
+    appeler({ mode: 'apercu' })
+      .then(function (j) {
+        if (!j || !j.url) throw new Error('pas d’URL');
+        document.getElementById('imgApercu').src = j.url;
+        document.getElementById('titre-res').textContent =
+          'Voilà le compte de ' + (demande.etablissement || 'votre établissement') + '.';
+        ouvrir(3);
+      })
+      .catch(function () {
+        r1.textContent = 'La génération n’a pas abouti. Réessayez dans un instant.';
+        ouvrir(1);
+      });
+  });
+
+  /* Le post : un seul, celui que la personne a choisi. */
+  genPost.addEventListener('click', function () {
+    var choisi = document.querySelector('input[name="typepost"]:checked');
+    var type = choisi ? choisi.value : 'plat';
+    var zone = document.getElementById('zonePost');
+    var img = document.getElementById('imgPost');
+    genPost.disabled = true; genPost.textContent = 'On le fabrique…';
+    r3.textContent = 'Une minute et demie environ.';
+    img.removeAttribute('src');
+    zone.hidden = false; zone.classList.add('travail');
+    appeler({ mode: 'post', type: type })
+      .then(function (j) {
+        if (!j || !j.url) throw new Error('pas d’URL');
+        img.src = j.url; zone.classList.remove('travail');
+        r3.textContent = 'Voilà. Choisissez-en un autre si vous voulez.';
+      })
+      .catch(function () {
+        zone.hidden = true; zone.classList.remove('travail');
+        r3.textContent = 'Ce post n’a pas pu être généré. Réessayez.';
+      })
+      .then(function () { genPost.disabled = false; genPost.textContent = 'Générer ce post'; });
   });
 
   /* L'échappée par email : tant qu'elle n'est pas branchée, elle le dit. Un
      champ qui accepte une adresse sans rien en faire est pire que pas de champ. */
-  var EMAIL = '';   // webhook n8n qui génère les neuf et envoie le lien
+  var EMAIL = '';
   formMail.addEventListener('submit', function (ev) {
     ev.preventDefault();
     if (!formMail.checkValidity()) { r2.textContent = 'Il manque une adresse valide.'; return; }
     if (!EMAIL) {
-      r2.textContent = 'L’envoi par email n’est pas encore branché — restez sur la page, les visuels arrivent.';
+      r2.textContent = 'L’envoi par email n’est pas encore branché — restez sur la page, l’aperçu arrive.';
       return;
     }
     envoyer.disabled = true; envoyer.textContent = 'Envoi…';
     fetch(EMAIL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(Object.assign({}, demande, { email: formMail.email.value })) })
       .then(function (r) { if (!r.ok) throw new Error(r.status); })
-      .then(function () {
-        r2.textContent = 'C’est noté. Vous recevez le lien dès que les neuf visuels sont prêts.';
-        formMail.reset();
-      })
+      .then(function () { r2.textContent = 'C’est noté. Vous recevez le lien dès que c’est prêt.'; formMail.reset(); })
       .catch(function () { r2.textContent = 'L’envoi n’a pas abouti. Réessayez.'; })
       .then(function () { envoyer.disabled = false; envoyer.textContent = 'Envoyez-le moi'; });
   });
