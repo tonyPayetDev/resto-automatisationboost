@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MenuAuto — Génération automatique de menus pour restaurants</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --yellow: #F5C518;
+      --red: #E63946;
+      --bg: #FFF9F0;
+      --dark: #111111;
+      --green: #2D9B4E;
+      --blue: #4A90D9;
+      --gray: #6B7280;
+      --light: #F9FAFB;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--dark); }
+
+    /* NAV */
+    nav {
+      background: var(--dark);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+    }
+    .nav-logo {
+      font-family: 'Lilita One', cursive;
+      font-size: 28px;
+      color: var(--yellow);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--red); }
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+    .nav-links a {
+      color: #ccc;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--yellow); }
+    .btn-nav {
+      background: var(--yellow);
+      color: var(--dark) !important;
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-weight: 900 !important;
+      font-size: 14px !important;
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    .btn-nav:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(245,197,24,0.4); color: var(--dark) !important; }
+
+    /* HERO */
+    .hero {
+      background: var(--dark);
+      padding: 80px 32px;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      left: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(245,197,24,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -100px;
+      right: -100px;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(230,57,70,0.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(245,197,24,0.15);
+      border: 1px solid rgba(245,197,24,0.3);
+      color: var(--yellow);
+      padding: 8px 20px;
+      border-radius: 50px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-family: 'Lilita One', cursive;
+      font-size: clamp(42px, 7vw, 80px);
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 .highlight { color: var(--yellow); }
+    .hero p {
+      font-size: clamp(16px, 2vw, 20px);
+      color: #aaa;
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.6;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+    .btn-primary {
+      background: var(--yellow);
+      color: var(--dark);
+      padding: 16px 36px;
+      border-radius: 50px;
+      font-weight: 900;
+      font-size: 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 30px rgba(245,197,24,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(245,197,24,0.5); }
+    .btn-secondary {
+      background: transparent;
+      color: #fff;
+      padding: 16px 36px;
+      border-radius: 50px;
+      font-weight: 800;
+      font-size: 16px;
+      text-decoration: none;
+      border: 2px solid rgba(255,255,255,0.2);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.05); }
+
+    /* PREVIEW CARDS */
+    .preview-section {
+      padding: 60px 32px;
+      background: var(--dark);
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .preview-label {
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+    }
+    .cards-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .menu-card {
+      width: 220px;
+      background: var(--bg);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      transform: rotate(var(--rot, 0deg));
+      transition: transform 0.3s;
+    }
+    .menu-card:hover { transform: rotate(0deg) scale(1.05); }
+    .card-logo {
+      background: var(--dark);
+      border-radius: 12px;
+      padding: 12px 10px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .card-logo .name {
+      font-family: 'Lilita One', cursive;
+      font-size: 22px;
+      color: var(--yellow);
+    }
+    .card-logo .sub {
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-top: 2px;
+    }
+    .card-date {
+      background: var(--dark);
+      color: #fff;
+      border-radius: 30px;
+      padding: 7px 14px;
+      text-align: center;
+      font-family: 'Lilita One', cursive;
+      font-size: 11px;
+      margin-bottom: 10px;
+    }
+    .card-item {
+      background: var(--dark);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      border-left: 4px solid var(--yellow);
+      font-size: 12px;
+      font-family: 'Lilita One', cursive;
+    }
+    .card-item.red { border-left-color: var(--red); }
+    .card-item.green { border-left-color: var(--green); }
+    .card-item.blue { border-left-color: var(--blue); }
+
+    /* STATS */
+    .stats {
+      background: var(--yellow);
+      padding: 40px 32px;
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Lilita One', cursive;
+      font-size: 48px;
+      color: var(--dark);
+      line-height: 1;
+    }
+    .stat-label {
+      font-weight: 800;
+      font-size: 13px;
+      color: rgba(0,0,0,0.6);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 4px;
+    }
+
+    /* FEATURES */
+    .features {
+      padding: 80px 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-title {
+      text-align: center;
+      font-family: 'Lilita One', cursive;
+      font-size: clamp(32px, 5vw, 52px);
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--gray);
+      font-size: 17px;
+      margin-bottom: 56px;
+      font-weight: 600;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 28px;
+      border: 2px solid transparent;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      border-color: var(--yellow);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(245,197,24,0.15);
+    }
+    .feature-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      background: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 19px; font-weight: 900; margin-bottom: 8px; }
+    .feature-card p { color: var(--gray); font-size: 14px; line-height: 1.6; font-weight: 600; }
+
+    /* HOW IT WORKS */
+    .how {
+      background: var(--dark);
+      padding: 80px 32px;
+    }
+    .how .section-title { color: #fff; }
+    .how .section-sub { color: #666; }
+    .steps {
+      display: flex;
+      gap: 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .step {
+      flex: 1;
+      min-width: 240px;
+      max-width: 300px;
+      text-align: center;
+      position: relative;
+    }
+    .step-num {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--yellow);
+      color: var(--dark);
+      font-family: 'Lilita One', cursive;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      box-shadow: 0 8px 24px rgba(245,197,24,0.4);
+    }
+    .step h3 { color: #fff; font-size: 18px; font-weight: 900; margin-bottom: 10px; }
+    .step p { color: #888; font-size: 14px; line-height: 1.6; font-weight: 600; }
+
+    /* WORKFLOW */
+    .workflow {
+      padding: 80px 32px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .workflow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .wf-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .wf-step:last-child { border-bottom: none; }
+    .wf-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .wf-content h4 { font-size: 16px; font-weight: 900; margin-bottom: 4px; }
+    .wf-content p { color: var(--gray); font-size: 13px; line-height: 1.5; font-weight: 600; }
+    .wf-tag {
+      display: inline-block;
+      background: rgba(245,197,24,0.15);
+      color: #b8900f;
+      border-radius: 30px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+
+    /* PRICING */
+    .pricing {
+      background: var(--dark);
+      padding: 80px 32px;
+    }
+    .pricing .section-title { color: #fff; }
+    .pricing .section-sub { color: #666; }
+    .pricing-grid {
+      display: flex;
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .pricing-card {
+      background: #1a1a1a;
+      border-radius: 24px;
+      padding: 36px 32px;
+      flex: 1;
+      min-width: 260px;
+      max-width: 340px;
+      border: 2px solid rgba(255,255,255,0.06);
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .pricing-card.featured {
+      border-color: var(--yellow);
+      background: #1e1a00;
+      transform: scale(1.05);
+    }
+    .pricing-card:hover { border-color: var(--yellow); }
+    .plan-badge {
+      display: inline-block;
+      background: var(--yellow);
+      color: var(--dark);
+      border-radius: 30px;
+      padding: 4px 14px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .plan-name { color: #fff; font-family: 'Lilita One', cursive; font-size: 26px; margin-bottom: 8px; }
+    .plan-price {
+      font-family: 'Lilita One', cursive;
+      font-size: 52px;
+      color: var(--yellow);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .plan-price span { font-size: 20px; color: #666; }
+    .plan-desc { color: #666; font-size: 13px; font-weight: 600; margin-bottom: 24px; }
+    .plan-features { list-style: none; margin-bottom: 28px; }
+    .plan-features li {
+      color: #bbb;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .plan-features li::before { content: '✓'; color: var(--green); font-weight: 900; }
+    .btn-plan {
+      width: 100%;
+      background: var(--yellow);
+      color: var(--dark);
+      border: none;
+      padding: 14px;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 900;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-plan:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(245,197,24,0.4); }
+    .btn-plan.outline {
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .btn-plan.outline:hover { border-color: var(--yellow); color: var(--yellow); box-shadow: none; }
+
+    /* TESTIMONIALS */
+    .testimonials {
+      padding: 80px 32px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .testi-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .stars { color: var(--yellow); font-size: 18px; margin-bottom: 12px; }
+    .testi-text { color: #444; font-size: 14px; line-height: 1.6; font-weight: 600; margin-bottom: 16px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .testi-name { font-weight: 900; font-size: 14px; }
+    .testi-role { color: var(--gray); font-size: 12px; font-weight: 600; }
+
+    /* CTA */
+    .cta {
+      background: linear-gradient(135deg, var(--dark) 0%, #1a1000 50%, var(--dark) 100%);
+      padding: 80px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(245,197,24,0.1) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .cta h2 {
+      font-family: 'Lilita One', cursive;
+      font-size: clamp(32px, 5vw, 56px);
+      color: #fff;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+    .cta h2 span { color: var(--yellow); }
+    .cta p {
+      color: #888;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* CONTACT FORM */
+    .contact-form {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      padding: 40px;
+      max-width: 560px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .form-group label { color: #bbb; font-size: 13px; font-weight: 800; letter-spacing: 0.5px; }
+    .form-group input, .form-group textarea, .form-group select {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: #fff;
+      font-family: 'Nunito', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: var(--yellow);
+    }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group select option { background: #1a1a1a; color: #fff; }
+
+    /* FOOTER */
+    footer {
+      background: #0a0a0a;
+      padding: 40px 32px;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-logo {
+      font-family: 'Lilita One', cursive;
+      font-size: 32px;
+      color: var(--yellow);
+      margin-bottom: 12px;
+    }
+    .footer-logo span { color: var(--red); }
+    footer p { color: #444; font-size: 13px; font-weight: 600; }
+    .footer-links { display: flex; gap: 24px; justify-content: center; margin: 16px 0; flex-wrap: wrap; }
+    .footer-links a { color: #555; text-decoration: none; font-size: 13px; font-weight: 700; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--yellow); }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .form-row { grid-template-columns: 1fr; }
+      .pricing-card.featured { transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">Menu<span>Auto</span></a>
+    <div class="nav-links">
+      <a href="#features">Fonctionnalités</a>
+      <a href="#how">Comment ça marche</a>
+      <a href="#pricing">Tarifs</a>
+      <a href="#contact" class="btn-nav">Commencer →</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">🍽️ Automatisation Restaurant · La Réunion</div>
+    <h1>Votre menu du jour<br>sur <span class="highlight">Instagram</span><br>en 1 clic</h1>
+    <p>Générez des visuels de menus professionnels, approuvez-les par email et publiez automatiquement sur Instagram — sans aucune compétence graphique.</p>
+    <div class="hero-btns">
+      <a href="#contact" class="btn-primary">🚀 Essayer gratuitement</a>
+      <a href="#how" class="btn-secondary">Voir comment ça marche</a>
+    </div>
+  </section>
+
+  <!-- PREVIEW CARDS -->
+  <section class="preview-section">
+    <div class="preview-label">Exemples générés automatiquement</div>
+    <div class="cards-row">
+      <div class="menu-card" style="--rot: -3deg">
+        <div class="card-logo">
+          <div class="name">Snack Étoile</div>
+          <div class="sub">• Snack Bar •</div>
+        </div>
+        <div class="card-date">🗓️ Menu du 03/04/26</div>
+        <div class="card-item">🍗 <span>Carry Poulet</span></div>
+        <div class="card-item red">🥩 <span>Rougail Saucisse</span></div>
+        <div class="card-item green">🐟 <span>Carry Thon</span></div>
+        <div class="card-item blue">🌶️ <span>Rougail Bringelle</span></div>
+      </div>
+      <div class="menu-card" style="--rot: 1.5deg">
+        <div class="card-logo" style="background:#1a0000">
+          <div class="name" style="color:#E63946">Chez Mamie</div>
+          <div class="sub" style="color:#F5C518">• Cuisine Créole •</div>
+        </div>
+        <div class="card-date">🗓️ Menu du 03/04/26</div>
+        <div class="card-item" style="border-left-color:#E63946">🍛 <span>Carry Cabri</span></div>
+        <div class="card-item red" style="border-left-color:#F5C518">🦐 <span>Cari Crevettes</span></div>
+        <div class="card-item green">🥦 <span>Brèdes Chouchou</span></div>
+        <div class="card-item blue">🍰 <span>Bonbon Piment</span></div>
+      </div>
+      <div class="menu-card" style="--rot: -1deg">
+        <div class="card-logo" style="background:#001a0a">
+          <div class="name" style="color:#2D9B4E">Le Spot</div>
+          <div class="sub" style="color:#4A90D9">• Fast Food •</div>
+        </div>
+        <div class="card-date">🗓️ Menu du 03/04/26</div>
+        <div class="card-item" style="border-left-color:#2D9B4E">🍔 <span>Burger Créole</span></div>
+        <div class="card-item red">🍕 <span>Pizza Jambon</span></div>
+        <div class="card-item green" style="border-left-color:#4A90D9">🥖 <span>Sandwich Poulet</span></div>
+        <div class="card-item blue">🥗 <span>Salade César</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-num">2min</div>
+      <div class="stat-label">Pour créer un menu</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">100%</div>
+      <div class="stat-label">Automatique</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">+40%</div>
+      <div class="stat-label">D'engagement Instagram</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">0€</div>
+      <div class="stat-label">Compétence graphique</div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <h2 class="section-title">Tout ce dont votre restaurant a besoin</h2>
+    <p class="section-sub">Un outil pensé pour les restaurateurs réunionnais, simple et efficace</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎨</div>
+        <h3>Visuels sur mesure</h3>
+        <p>Choisissez vos couleurs, votre police et votre style. Chaque restaurant a sa propre identité visuelle.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>Emojis automatiques</h3>
+        <p>Le système détecte vos plats (carry poulet, rougail saucisse, etc.) et ajoute les bons emojis automatiquement.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✉️</div>
+        <h3>Approbation par email</h3>
+        <p>Recevez un aperçu de votre menu par email avant publication. Vous choisissez la date et l'heure.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📱</div>
+        <h3>Publication Instagram</h3>
+        <p>Une fois approuvé, votre menu est publié automatiquement sur Instagram à l'heure que vous avez choisie.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Planification intelligente</h3>
+        <p>Programmez vos publications à l'avance. Le workflow gère tout, même pendant votre service.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Prêt en 2 minutes</h3>
+        <p>Remplissez un formulaire simple avec vos plats du jour et le reste se fait automatiquement.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <h2 class="section-title">Comment ça marche</h2>
+    <p class="section-sub">3 étapes simples pour publier votre menu quotidien</p>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Saisissez vos plats</h3>
+        <p>Remplissez le formulaire avec le nom de votre restaurant, la date et vos plats du jour. C'est tout.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Approuvez le visuel</h3>
+        <p>Vous recevez un email avec l'image générée. Vous choisissez de publier ou non, et à quelle heure.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Publication automatique</h3>
+        <p>Votre menu est publié sur Instagram au moment voulu, avec légende et hashtags adaptés à La Réunion.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKFLOW DETAIL -->
+  <section class="workflow">
+    <h2 class="section-title">Sous le capot</h2>
+    <p class="section-sub">Un workflow n8n professionnel qui tourne en arrière-plan</p>
+    <div class="workflow-steps">
+      <div class="wf-step">
+        <div class="wf-icon">📝</div>
+        <div class="wf-content">
+          <h4>Formulaire client</h4>
+          <p>Vous remplissez un formulaire en ligne avec vos plats, votre restaurant, vos préférences visuelles.</p>
+          <span class="wf-tag">Interface web</span>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-icon">🎨</div>
+        <div class="wf-content">
+          <h4>Génération HTML dynamique</h4>
+          <p>Un template HTML sur mesure est créé avec vos couleurs, votre police et vos plats avec emojis automatiques.</p>
+          <span class="wf-tag">JavaScript · Templates</span>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-icon">📸</div>
+        <div class="wf-content">
+          <h4>Screenshot haute résolution</h4>
+          <p>Le HTML est converti en image 1000×1800px via l'API htmlcsstoimage, prête pour Instagram.</p>
+          <span class="wf-tag">API HCTI · 2x résolution</span>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-icon">✅</div>
+        <div class="wf-content">
+          <h4>Approbation email interactive</h4>
+          <p>Vous recevez l'image par email avec un formulaire intégré pour valider, choisir la date et l'heure.</p>
+          <span class="wf-tag">Gmail OAuth · Formulaire inline</span>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-icon">📲</div>
+        <div class="wf-content">
+          <h4>Publication Instagram planifiée</h4>
+          <p>L'image est uploadée et la publication est programmée sur Instagram via Blotato à l'heure exacte choisie.</p>
+          <span class="wf-tag">Blotato API · Instagram</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <h2 class="section-title">Tarifs simples et transparents</h2>
+    <p class="section-sub">Sans engagement, sans frais cachés</p>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="plan-badge">Starter</div>
+        <div class="plan-name">Essentiel</div>
+        <div class="plan-price">49<span>€/mois</span></div>
+        <div class="plan-desc">Pour les petits restaurants et snacks</div>
+        <ul class="plan-features">
+          <li>30 menus par mois</li>
+          <li>1 compte Instagram</li>
+          <li>Templates standards</li>
+          <li>Approbation par email</li>
+          <li>Support par email</li>
+        </ul>
+        <button class="btn-plan outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Commencer</button>
+      </div>
+      <div class="pricing-card featured">
+        <div class="plan-badge">⭐ Populaire</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">89<span>€/mois</span></div>
+        <div class="plan-desc">Pour les restaurants actifs</div>
+        <ul class="plan-features">
+          <li>Menus illimités</li>
+          <li>2 comptes Instagram</li>
+          <li>Templates personnalisés</li>
+          <li>Approbation par email</li>
+          <li>Couleurs & polices custom</li>
+          <li>Support prioritaire</li>
+        </ul>
+        <button class="btn-plan" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Commencer →</button>
+      </div>
+      <div class="pricing-card">
+        <div class="plan-badge">Agence</div>
+        <div class="plan-name">Multi-Resto</div>
+        <div class="plan-price">199<span>€/mois</span></div>
+        <div class="plan-desc">Pour gérer plusieurs établissements</div>
+        <ul class="plan-features">
+          <li>Restaurants illimités</li>
+          <li>Comptes Instagram illimités</li>
+          <li>Dashboard centralisé</li>
+          <li>Templates par restaurant</li>
+          <li>API + Webhooks</li>
+          <li>Support dédié</li>
+        </ul>
+        <button class="btn-plan outline" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Nous contacter</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <h2 class="section-title">Ils nous font confiance</h2>
+    <p class="section-sub">Des restaurateurs de La Réunion satisfaits</p>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"Avant je passais 20 minutes par jour à faire mes visuels sur Canva. Maintenant je remplis le formulaire en 2 minutes et c'est publié automatiquement. Un gain de temps fou !"</p>
+        <div class="testi-author">
+          <div class="testi-avatar">👨‍🍳</div>
+          <div>
+            <div class="testi-name">Patrick R.</div>
+            <div class="testi-role">Snack Le Creuset, Saint-Denis</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"Les visuels sont vraiment beaux, mes clients me demandent souvent comment je fais. Je recommande à tous les restaurateurs qui veulent avoir une présence sur Instagram."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">👩‍🍳</div>
+          <div>
+            <div class="testi-name">Marie-Claude L.</div>
+            <div class="testi-role">Restaurant Chez Marie, Saint-Pierre</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"Le système d'approbation par email est super pratique. Je valide depuis mon téléphone pendant le service et ça publie tout seul à l'heure que j'ai choisie."</p>
+        <div class="testi-author">
+          <div class="testi-avatar">🧑‍🍳</div>
+          <div>
+            <div class="testi-name">Joël M.</div>
+            <div class="testi-role">Fast Food Le Spot, Saint-Gilles</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA + CONTACT -->
+  <section class="cta" id="contact">
+    <h2>Prêt à automatiser<br>votre <span>présence Instagram</span> ?</h2>
+    <p>Démarrez votre essai gratuit de 14 jours — aucune carte bancaire requise</p>
+    <div class="contact-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Prénom</label>
+          <input type="text" placeholder="Jean-Claude" />
+        </div>
+        <div class="form-group">
+          <label>Nom du restaurant</label>
+          <input type="text" placeholder="Snack Étoile" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="contact@monrestaurant.re" />
+      </div>
+      <div class="form-group">
+        <label>Téléphone (WhatsApp)</label>
+        <input type="tel" placeholder="+262 692 XX XX XX" />
+      </div>
+      <div class="form-group">
+        <label>Type d'établissement</label>
+        <select>
+          <option value="">Sélectionnez...</option>
+          <option>Snack Bar</option>
+          <option>Restaurant</option>
+          <option>Fast Food</option>
+          <option>Boulangerie / Pâtisserie</option>
+          <option>Food Truck</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Compte Instagram (optionnel)</label>
+        <input type="text" placeholder="@monrestaurant" />
+      </div>
+      <button class="btn-plan" style="font-size:16px; padding:16px" onclick="alert('Merci ! Nous vous contacterons dans les 24h.')">
+        🚀 Démarrer mon essai gratuit
+      </button>
+      <p style="color:#555; font-size:12px; text-align:center; margin-top:12px; font-weight:600;">
+        ✓ 14 jours gratuits &nbsp;·&nbsp; ✓ Sans engagement &nbsp;·&nbsp; ✓ Support WhatsApp inclus
+      </p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Menu<span>Auto</span></div>
+    <div class="footer-links">
+      <a href="#features">Fonctionnalités</a>
+      <a href="#how">Comment ça marche</a>
+      <a href="#pricing">Tarifs</a>
+      <a href="mailto:contact@automatisationboost.com">Contact</a>
+      <a href="#">Mentions légales</a>
+    </div>
+    <p>© 2026 MenuAuto · <a href="https://automatisationboost.com" style="color:#555; text-decoration:none;">AutomatisationBoost</a> · La Réunion 🌺</p>
+  </footer>
+
+</body>
+</html>
