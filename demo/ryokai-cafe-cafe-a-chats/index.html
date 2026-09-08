@@ -1,0 +1,83 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ryokaï Café - Café à chats — un feed Instagram, en exemple</title>
+<meta name="description" content="À quoi ressemblerait le compte Instagram de Ryokaï Café - Café à chats, monté à partir de leurs propres photos.">
+<style>
+:root{--bg:#0b0b0d;--carte:#141418;--trait:#26262c;--or:#f0a500;--doux:#9b9ba4;--txt:#f4f4f6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font:400 16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:30px 16px 70px;display:flex;flex-direction:column;align-items:center}
+.w{width:min(100%,430px)}
+.sur{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--doux);text-align:center}
+h1{font-size:clamp(22px,5.4vw,29px);letter-spacing:-.02em;text-align:center;margin:8px 0 6px;text-wrap:balance}
+.s{color:var(--doux);text-align:center;font-size:14.5px;margin-bottom:22px}
+.tel{background:var(--carte);border:1px solid var(--trait);border-radius:16px;overflow:hidden}
+.tete{padding:15px 15px 12px;display:flex;gap:12px;align-items:center}
+.pp{width:56px;height:56px;border-radius:50%;background-size:cover;background-position:center;flex:none;border:2px solid var(--or)}
+.tid h2{font-size:17px;letter-spacing:-.01em}
+.tid p{font-size:13px;color:var(--doux)}
+.sto{display:flex;gap:11px;padding:0 15px 14px;overflow-x:auto}
+.sto div{text-align:center;flex:none}
+.sto i{display:block;width:52px;height:52px;border-radius:50%;background-size:cover;background-position:center;
+  border:2px solid var(--or);outline:2px solid var(--carte)}
+.sto span{display:block;font-size:10.5px;color:var(--doux);margin-top:4px}
+.gr{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.v{position:relative;aspect-ratio:1;background-size:cover;background-position:center}
+.ombre{position:absolute;inset:0;background:linear-gradient(to top,#000000cc,transparent 62%)}
+.hk{position:absolute;left:8px;right:8px;bottom:8px;font:800 12px/1.2 inherit;letter-spacing:-.01em}
+.hk em{font-style:normal;color:var(--or)}
+.mn{position:absolute;left:8px;right:8px;bottom:8px;background:#0b0b0dd9;border-radius:6px;padding:7px 8px}
+.mn b{display:block;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--or);margin-bottom:3px;
+  overflow-wrap:anywhere}
+.mn span{display:block;font-size:10.5px;color:#dcdce2}
+.note{margin-top:22px;background:var(--carte);border:1px solid var(--trait);border-radius:14px;padding:17px 18px;font-size:14.5px}
+.note b{color:var(--or)}
+.note p+p{margin-top:9px}
+.cta{display:block;margin-top:16px;background:var(--or);color:#1a1200;text-align:center;font-weight:800;
+  text-decoration:none;border-radius:11px;padding:15px 18px}
+.pied{margin-top:16px;font-size:12.5px;color:var(--doux);text-align:center}
+.pied a{color:var(--doux)}
+</style>
+<div class="w">
+  <p class="sur">Exemple · non publié</p>
+  <h1>Ryokaï Café - Café à chats</h1>
+  <p class="s">À quoi ressemblerait votre compte Instagram, monté avec <b>vos propres photos</b>.</p>
+
+  <div class="tel">
+    <div class="tete">
+      <div class="pp" style="background-image:url('photos/p01.jpg')"></div>
+      <div class="tid"><h2>Ryokaï Café - Café à chats</h2><p>Saint-Denis</p></div>
+    </div>
+    <div class="sto">
+      <div><i style="background-image:url('photos/p02.jpg')"></i><span>Maison</span></div>
+      <div><i style="background-image:url('photos/p03.jpg')"></i><span>Cuisine</span></div>
+      <div><i style="background-image:url('photos/p04.jpg')"></i><span>Frais</span></div>
+      <div><i style="background-image:url('photos/p05.jpg')"></i><span>Partage</span></div>
+      <div><i style="background-image:url('photos/p06.jpg')"></i><span>Goût</span></div>
+    </div>
+    <div class="gr">
+      <div class="v" style="background-image:url('photos/p01.jpg')"></div>
+      <div class="v" style="background-image:url('photos/p02.jpg')"><div class="ombre"></div><p class="hk">FAIT<br><em>SUR PLACE.</em></p></div>
+      <div class="v" style="background-image:url('photos/p03.jpg')"><div class="ombre"></div><div class="mn"><b>Notre carte</b><span>Plat du jour</span><span>Suggestion du chef</span><span>Fait maison</span></div></div>
+      <div class="v" style="background-image:url('photos/p04.jpg')"><div class="ombre"></div><p class="hk">L'ADDITION<br><em>EST HONNÊTE.</em></p></div>
+      <div class="v" style="background-image:url('photos/p05.jpg')"></div>
+      <div class="v" style="background-image:url('photos/p06.jpg')"></div>
+      <div class="v" style="background-image:url('photos/p07.jpg')"><div class="ombre"></div><div class="mn"><b>Le comptoir</b><span>Plat du jour</span><span>Suggestion du chef</span><span>Fait maison</span></div></div>
+      <div class="v" style="background-image:url('photos/p08.jpg')"><div class="ombre"></div><p class="hk">ON T’ATTEND<br><em>CE SOIR.</em></p></div>
+      <div class="v" style="background-image:url('photos/p01.jpg')"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <p><b>Les photos sont les vôtres.</b> Elles viennent de ryokaicafe.re.
+    Rien n'a été inventé, rien n'a été acheté sur une banque d'images.</p>
+    <p>Ce qui change par rapport à un compte tenu à la main : les publications sont préparées
+    d'avance, à heure fixe, sans que quelqu'un en cuisine ait à y penser.</p>
+    <p>Cette page n'est visible que par vous. Rien n'a été publié nulle part.</p>
+  </div>
+
+  <a class="cta" href="https://automatisationboost.com/r.html?a=ryokai-cafe-cafe-a-chats&q=audit&s=resto">Voir ce que ça donnerait chez vous</a>
+  <p class="pied">Tony PAYET · AutomatisationBoost · La Réunion —
+    <a href="mailto:tony.payet.professionnel@gmail.com">tony.payet.professionnel@gmail.com</a></p>
+</div>

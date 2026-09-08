@@ -1,534 +1,76 @@
 <!doctype html>
-<html lang="fr">
-<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Votre feed Instagram, en deux minutes — Food Boost</title>
-<meta name="description" content="Dites-nous trois plats. On vous montre à quoi ressemblerait votre compte Instagram. Gratuit, sans engagement.">
 <meta name="robots" content="noindex, nofollow">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Exemples de feeds — Food Boost</title>
 <style>
-/* ══════════════════════════════════════════════════════════════════════════
-   FOOD BOOST — la démo.
-   Charte identique à la landing : vert forêt #0d2818 / #14301c, orange
-   #E8722A, titres serif blanc, corps sans-serif clair.
-
-   Le parcours tient en trois écrans et un seul geste par écran. C'est la
-   contrainte qui a décidé de tout le reste : un restaurateur remplit ça entre
-   deux services, sur un téléphone, une main occupée.
-   ══════════════════════════════════════════════════════════════════════════ */
-:root{
-  --vert-profond:#0d2818; --vert:#14301c; --vert-clair:#1b3b25;
-  --orange:#E8722A; --orange-sombre:#c85f20;
-  --blanc:#F5F2EC; --corps:#DCE3D8; --attenue:#A9B8A6; --indice:#9AAB97;
-  --filet:rgba(245,242,236,.12);
-  --serif:"Playfair Display",Georgia,serif;
-  --sans:"Jost",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  --sortie:cubic-bezier(.16,1,.3,1);
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--vert-profond);color:var(--corps);
-  font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.65;
-  -webkit-font-smoothing:antialiased;min-height:100vh}
-::selection{background:var(--orange);color:#12100c}
-:focus-visible{outline:2px solid var(--orange);outline-offset:3px;border-radius:6px}
-html{scrollbar-color:var(--orange) var(--vert)}
-::-webkit-scrollbar{width:11px}
-::-webkit-scrollbar-track{background:var(--vert)}
-::-webkit-scrollbar-thumb{background:#2e5236;border-radius:99px;border:3px solid var(--vert)}
-img{max-width:100%;display:block}
-
-.page{max-width:660px;margin:0 auto;padding:clamp(26px,6vw,58px) clamp(20px,5vw,40px) 80px}
-
-.marque{font-family:var(--serif);font-weight:600;font-size:15px;letter-spacing:.02em;
-  color:var(--blanc);line-height:1.1;margin-bottom:clamp(26px,5vw,44px)}
-.marque em{font-style:normal;color:var(--orange)}
-
-h1{font-family:var(--serif);color:var(--blanc);font-weight:500;margin:0 0 12px;
-  font-size:clamp(30px,5.4vw,44px);line-height:1.14;letter-spacing:-.015em;text-wrap:balance}
-.chapeau{margin:0 0 clamp(28px,5vw,42px);color:var(--attenue);font-size:16px;max-width:46ch}
-
-/* ── Le fil des trois écrans ─────────────────────────────────────────── */
-.fil{display:flex;gap:8px;margin-bottom:clamp(26px,4.5vw,38px)}
-.fil i{flex:1;height:3px;border-radius:99px;background:var(--filet);
-  transition:background-color .6s var(--sortie)}
-.fil i.faite{background:var(--orange)}
-
-.ecran{display:none}
-.ecran.ouvert{display:block;animation:entre .55s var(--sortie) both}
-@keyframes entre{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-
-/* ── Champs ──────────────────────────────────────────────────────────── */
-.champ{display:grid;gap:7px;margin-bottom:20px}
-.champ label{font-size:12px;letter-spacing:.11em;text-transform:uppercase;color:var(--attenue)}
-.champ label span{color:var(--orange);text-transform:none;letter-spacing:0;font-size:12.5px}
-.champ input,.plat input,.echappee input{font-family:var(--sans);font-size:16px;font-weight:300;color:var(--blanc);
-  background:var(--vert-clair);border:1px solid var(--filet);border-radius:11px;
-  padding:14px 16px;width:100%;caret-color:var(--orange);
-  transition:border-color .25s ease}
-.champ input::placeholder,.plat input::placeholder,.echappee input::placeholder{color:var(--indice)}
-.champ input:hover,.plat input:hover,.echappee input:hover{border-color:rgba(245,242,236,.24)}
-.champ input:focus,.plat input:focus,.echappee input:focus{outline:none;
-  border-color:var(--orange);box-shadow:inset 0 0 0 1px rgba(232,114,42,.45)}
-.deux{display:grid;gap:20px}
-@media(min-width:560px){.deux{grid-template-columns:1fr 1fr}}
-
-/* Les trois plats : trois lignes numérotées, pas trois champs identiques —
-   le chiffre dit qu'il en faut trois et évite la question. */
-.plats{display:grid;gap:10px;margin-bottom:20px}
-.plat{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:10px}
-.plat span{font-family:var(--serif);font-size:19px;color:var(--attenue);text-align:center}
-.plat input{margin:0}
-
-/* ── Choix du style ──────────────────────────────────────────────────── */
-.styles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:26px}
-.styles > *{min-width:0}
-.style{position:relative;cursor:pointer;margin:0}
-.style input{position:absolute;opacity:0;width:0;height:0}
-.style .vignette{display:block;border-radius:12px;overflow:hidden;border:2px solid transparent;
-  transition:border-color .25s ease,transform .3s var(--sortie)}
-.style img{width:100%;aspect-ratio:4/5;object-fit:cover}
-.style .nom{display:block;margin-top:9px;text-align:center;font-size:12.5px;
-  color:var(--attenue);transition:color .25s ease}
-.style:hover .vignette{transform:translateY(-3px)}
-.style input:checked + .vignette{border-color:var(--orange)}
-.style input:checked ~ .nom{color:var(--orange)}
-.style input:focus-visible + .vignette{outline:2px solid var(--orange);outline-offset:3px}
-
-/* ── Boutons ─────────────────────────────────────────────────────────── */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
-  font-family:var(--sans);font-size:16px;font-weight:500;padding:16px 30px;
-  border-radius:999px;border:1px solid transparent;cursor:pointer;text-decoration:none;
-  transition:transform .25s var(--sortie),background-color .25s ease,border-color .25s ease}
-.btn-plein{background:var(--orange);color:#12100c;width:100%;
-  box-shadow:0 8px 20px -10px rgba(0,0,0,.75)}
-.btn-plein:hover{background:#f0813c;transform:translateY(-2px)}
-.btn-plein:active{background:var(--orange-sombre);transform:none}
-.btn-ligne{border-color:rgba(232,114,42,.55);color:var(--orange);background:transparent}
-.btn-ligne:hover{border-color:var(--orange);background:rgba(232,114,42,.10)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.mention{margin:14px 0 0;font-size:13px;color:var(--attenue);text-align:center}
-
-
-/* ── Le profil : en-tête et stories en HTML, tuiles générées ──────────
-   Une seule image contenant les neuf cases donne ~230 px par case : le modèle
-   y dessine neuf miniatures et la typographie bave. Les tuiles sont donc
-   générées une par une, en pleine résolution, et c'est NOUS qui composons
-   l'en-tête — la typo y est nette, et rien n'y est inventé. */
-.profil{max-width:380px;margin:0 auto clamp(26px,4vw,38px);background:var(--vert-clair);
-  border:1px solid var(--filet);border-radius:16px;overflow:hidden;
-  box-shadow:0 30px 60px -40px rgba(0,0,0,.95)}
-.profil-tete{display:flex;align-items:center;gap:14px;padding:18px 18px 12px}
-.pastille{flex:0 0 58px;width:58px;height:58px;border-radius:50%;display:grid;
-  place-items:center;background:var(--orange);color:#12100c;
-  font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:.02em}
-.profil-id{min-width:0}
-.profil-id strong{display:block;color:var(--blanc);font-weight:500;font-size:16px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.profil-id span{display:block;font-size:13px;color:var(--attenue);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.stories{display:flex;gap:12px;padding:6px 18px 16px;overflow-x:auto;
-  scrollbar-width:none}
-.stories::-webkit-scrollbar{display:none}
-.stories i{flex:0 0 auto;display:grid;place-items:center;width:52px;
-  font-size:10px;letter-spacing:.06em;color:var(--attenue);font-style:normal;
-  text-align:center;gap:6px}
-.stories i::before{content:"";width:46px;height:46px;border-radius:50%;
-  background:var(--vert);border:1.5px solid rgba(232,114,42,.5)}
-.grille9{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--vert)}
-.grille9 > div{aspect-ratio:4/5;background:var(--vert-clair);position:relative;overflow:hidden}
-.grille9 > div::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(100deg,transparent 20%,rgba(245,242,236,.08) 50%,transparent 80%);
-  transform:translateX(-100%);animation:balaye 1.9s linear infinite}
-.grille9 > div:nth-child(2)::after{animation-delay:.2s}
-.grille9 > div:nth-child(3)::after{animation-delay:.4s}
-.grille9 > div:nth-child(4)::after{animation-delay:.6s}
-.grille9 > div:nth-child(5)::after{animation-delay:.8s}
-.grille9 > div:nth-child(6)::after{animation-delay:1s}
-.grille9 > div:nth-child(7)::after{animation-delay:1.2s}
-.grille9 > div:nth-child(8)::after{animation-delay:1.4s}
-.grille9 > div:nth-child(9)::after{animation-delay:1.6s}
-.grille9 > div.prete::after{display:none}
-.grille9 img{width:100%;height:100%;object-fit:cover;animation:entre .6s var(--sortie) both}
-@keyframes balaye{to{transform:translateX(100%)}}
-
-/* ── Écran 3 : l'aperçu, le choix, le post ───────────────────────────── */
-.choisir{background:var(--vert);border:1px solid var(--filet);border-radius:16px;
-  padding:clamp(20px,4vw,30px);margin-bottom:clamp(24px,4vw,34px)}
-.choisir h2{font-family:var(--serif);color:var(--blanc);font-weight:500;
-  font-size:clamp(19px,2.8vw,24px);margin:0 0 6px;line-height:1.3}
-.choisir > p{margin:0 0 18px;font-size:14px;color:var(--attenue)}
-.types{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:20px}
-.typ{cursor:pointer;margin:0}
-.typ input{position:absolute;opacity:0;width:0;height:0}
-.typ span{display:inline-block;padding:10px 17px;border-radius:999px;font-size:14px;
-  color:var(--corps);background:var(--vert-clair);border:1px solid var(--filet);
-  transition:border-color .25s ease,color .25s ease,background-color .25s ease}
-.typ:hover span{border-color:rgba(245,242,236,.28)}
-.typ input:checked + span{border-color:var(--orange);color:var(--orange);
-  background:rgba(232,114,42,.10)}
-.typ input:focus-visible + span{outline:2px solid var(--orange);outline-offset:3px}
-.post{margin-top:20px;max-width:300px}
-.post img{width:100%;border-radius:12px;border:1px solid var(--filet)}
-.post.travail{aspect-ratio:4/5;background:var(--vert-clair);border-radius:12px;
-  border:1px solid var(--filet);position:relative;overflow:hidden}
-
-/* ── anciens styles d'écran, conservés pour la suite ───────────────── */
-.grille-att{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
-  margin:0 0 clamp(24px,4vw,34px);border-radius:12px;overflow:hidden}
-.grille-att > div{aspect-ratio:4/5;background:var(--vert-clair);position:relative;overflow:hidden}
-.grille-att > div::after{content:"";position:absolute;inset:0;
-  background:linear-gradient(100deg,transparent 20%,rgba(245,242,236,.07) 50%,transparent 80%);
-  transform:translateX(-100%);animation:balaye 1.9s linear infinite}
-.grille-att > div:nth-child(2)::after{animation-delay:.22s}
-.grille-att > div:nth-child(3)::after{animation-delay:.44s}
-.grille-att > div:nth-child(4)::after{animation-delay:.66s}
-.grille-att > div:nth-child(5)::after{animation-delay:.88s}
-.grille-att > div:nth-child(6)::after{animation-delay:1.1s}
-.grille-att > div:nth-child(7)::after{animation-delay:1.32s}
-.grille-att > div:nth-child(8)::after{animation-delay:1.54s}
-.grille-att > div:nth-child(9)::after{animation-delay:1.76s}
-@keyframes balaye{to{transform:translateX(100%)}}
-.grille-att > div.prete::after{display:none}
-.grille-att img{width:100%;height:100%;object-fit:cover;
-  animation:entre .6s var(--sortie) both}
-.compte{font-variant-numeric:tabular-nums;color:var(--orange);font-weight:500}
-
-.echappee{background:var(--vert);border:1px solid var(--filet);border-radius:14px;
-  padding:22px clamp(18px,4vw,26px);margin-top:clamp(24px,4vw,34px)}
-.echappee h2{font-family:var(--serif);color:var(--blanc);font-weight:500;
-  font-size:19px;margin:0 0 6px}
-.echappee p{margin:0 0 16px;font-size:14px;color:var(--attenue)}
-.echappee .ligne{display:grid;gap:10px}
-@media(min-width:520px){.echappee .ligne{grid-template-columns:1fr auto}}
-.echappee input{margin:0}
-.echappee .btn{width:auto;white-space:nowrap;padding-inline:24px}
-
-/* ── Écran 3 : le résultat ───────────────────────────────────────────── */
-.grille-res{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
-  border-radius:12px;overflow:hidden;margin-bottom:clamp(24px,4vw,34px)}
-.grille-res > *{min-width:0}
-.grille-res img{width:100%;aspect-ratio:4/5;object-fit:cover}
-.suite{background:var(--vert);border:1px solid rgba(232,114,42,.3);border-radius:16px;
-  padding:clamp(22px,4vw,32px);text-align:center}
-.suite h2{font-family:var(--serif);color:var(--blanc);font-weight:500;
-  font-size:clamp(21px,3.4vw,27px);margin:0 0 10px;line-height:1.3}
-.suite p{margin:0 0 20px;font-size:14.5px;color:var(--attenue);max-width:44ch;
-  margin-inline:auto}
-.suite .btn-plein{width:auto;padding-inline:32px}
-.suite .apres{margin:16px 0 0;font-size:13px;color:var(--attenue)}
-
-.retour{margin:16px 0 0;text-align:center;font-size:14px;color:var(--orange);min-height:1.3em}
-
-footer{margin-top:clamp(40px,6vw,64px);padding-top:24px;border-top:1px solid var(--filet);
-  font-size:12.5px;color:var(--attenue);text-align:center}
-
-@media(prefers-reduced-motion:reduce){
-  .ecran.ouvert{animation:none}
-  .grille-att > div::after{animation:none}
-  .grille-att img{animation:none}
-  .btn:hover,.style:hover .vignette{transform:none}
-}
+:root{--bg:#0b0b0d;--carte:#141418;--trait:#26262c;--or:#f0a500;--doux:#9b9ba4;--txt:#f4f4f6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font:400 16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:32px 18px 70px}
+.w{max-width:960px;margin:0 auto}
+h1{font-size:clamp(24px,5vw,32px);letter-spacing:-.02em}
+p.s{color:var(--doux);max-width:56ch;margin:10px 0 26px}
+.g{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.c{display:block;background:var(--carte);border:1px solid var(--trait);border-radius:14px;overflow:hidden;text-decoration:none;color:inherit}
+.c:hover{border-color:var(--or)}
+.im{display:block;aspect-ratio:4/3;background-size:cover;background-position:center}
+.t{display:block;padding:12px 14px 0;font-weight:700;letter-spacing:-.01em}
+.q{display:block;padding:2px 14px 14px;font-size:13px;color:var(--doux)}
 </style>
-</head>
-<body>
-<div class="page">
-
-  <div class="marque">FOOD<br>BOOST <em>🌿</em></div>
-
-  <div class="fil" aria-hidden="true"><i id="f1" class="faite"></i><i id="f2"></i><i id="f3"></i></div>
-
-  <!-- ══ Écran 1 — ce qu'on sert ══ -->
-  <section class="ecran ouvert" id="e1">
-    <h1>Dites-nous trois plats. On vous montre votre compte.</h1>
-    <p class="chapeau">Pas de compte à créer, rien à installer. Deux minutes, et vous voyez à quoi
-      ressemblerait votre Instagram si quelqu'un s'en occupait.</p>
-
-    <form id="form">
-      <div class="deux">
-        <div class="champ">
-          <label for="etab">Nom de l'établissement</label>
-          <input id="etab" name="etablissement" type="text" required autocomplete="organization"
-                 placeholder="Chez Marie">
-        </div>
-        <div class="champ">
-          <label for="ville">Ville</label>
-          <input id="ville" name="ville" type="text" required autocomplete="address-level2"
-                 placeholder="Saint-Denis">
-        </div>
-      </div>
-
-      <div class="champ" style="margin-bottom:10px">
-        <label>Trois plats que vous servez <span>— ceux dont vous êtes fier</span></label>
-      </div>
-      <div class="plats">
-        <div class="plat"><span>1</span><input name="plat1" type="text" required placeholder="Cari poulet"></div>
-        <div class="plat"><span>2</span><input name="plat2" type="text" required placeholder="Rougail saucisse"></div>
-        <div class="plat"><span>3</span><input name="plat3" type="text" required placeholder="Gâteau patate"></div>
-      </div>
-
-      <div class="champ" style="margin-bottom:12px">
-        <label>Le style qui vous ressemble</label>
-      </div>
-      <div class="styles">
-        <label class="style">
-          <input type="radio" name="style" value="creole" checked>
-          <span class="vignette"><img src="styles/creole.jpg" alt="Style créole : vert profond, doré, feuillage tropical"></span>
-          <span class="nom">Créole</span>
-        </label>
-        <label class="style">
-          <input type="radio" name="style" value="elegant">
-          <span class="vignette"><img src="styles/elegant.jpg" alt="Style élégant : noir profond, serif fine, lumière basse"></span>
-          <span class="nom">Élégant</span>
-        </label>
-        <label class="style">
-          <input type="radio" name="style" value="franc">
-          <span class="vignette"><img src="styles/franc.jpg" alt="Style franc : aplat orange, typographie lourde"></span>
-          <span class="nom">Franc</span>
-        </label>
-      </div>
-
-      <button class="btn btn-plein" type="submit" id="lancer">Générer mon feed</button>
-      <p class="mention">Gratuit, sans engagement. On n'invente ni vos prix, ni vos horaires,
-        ni vos avis.</p>
-      <p class="retour" id="retour1" role="status" aria-live="polite"></p>
-    </form>
-  </section>
-
-  <!-- ══ Écran 2 — les neuf tuiles arrivent dans le profil ══ -->
-  <section class="ecran" id="e2">
-    <h1>On fabrique votre compte.</h1>
-    <p class="chapeau"><span class="compte" id="compte">0</span> visuel sur 9 — deux à trois
-      minutes. Chaque tuile est générée en pleine résolution ; l'écran se remplit tout seul.</p>
-
-    <div class="profil" id="profil">
-      <div class="profil-tete">
-        <div class="pastille" id="pastille"></div>
-        <div class="profil-id">
-          <strong id="pNom">Votre établissement</strong>
-          <span id="pBio">Restaurant</span>
-        </div>
-      </div>
-      <div class="stories" id="stories"></div>
-      <div class="grille9" id="grille">
-        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
-      </div>
-    </div>
-
-    <div class="echappee">
-      <h2>Pas le temps d'attendre&nbsp;?</h2>
-      <p>Laissez votre email : on vous envoie le lien dès que c'est prêt. Vous pouvez fermer
-        cette page.</p>
-      <form class="ligne" id="form-mail">
-        <input type="email" name="email" required autocomplete="email" placeholder="vous@votre-resto.fr">
-        <button class="btn btn-ligne" type="submit" id="envoyer">Envoyez-le moi</button>
-      </form>
-      <p class="retour" id="retour2" role="status" aria-live="polite"></p>
-    </div>
-  </section>
-
-  <!-- ══ Écran 3 — le compte, puis le post que la personne choisit ══ -->
-  <section class="ecran" id="e3">
-    <h1 id="titre-res">Voilà votre compte.</h1>
-    <p class="chapeau">Aucun prix, aucun horaire, aucun avis n'a été inventé. Ce que vous avez
-      écrit est ce qui s'affiche.</p>
-
-    <div class="profil" id="profilFinal"></div>
-
-    <div class="choisir">
-      <h2>Maintenant, choisissez un post à générer</h2>
-      <p>Un seul, en grand, prêt à publier. Vous pouvez en refaire un autre après.</p>
-      <div class="types">
-        <label class="typ"><input type="radio" name="typepost" value="plat" checked><span>Le plat du jour</span></label>
-        <label class="typ"><input type="radio" name="typepost" value="coulisses"><span>Les coulisses</span></label>
-        <label class="typ"><input type="radio" name="typepost" value="salle"><span>La salle, le soir</span></label>
-        <label class="typ"><input type="radio" name="typepost" value="carte"><span>Une carte à votre nom</span></label>
-        <label class="typ"><input type="radio" name="typepost" value="story"><span>Une story</span></label>
-      </div>
-      <button class="btn btn-plein" id="genPost">Générer ce post</button>
-      <p class="retour" id="retour3" role="status" aria-live="polite"></p>
-      <div class="post" id="zonePost" hidden><img id="imgPost" alt="Post généré"></div>
-    </div>
-
-    <div class="suite">
-      <h2>On les publie sur votre compte&nbsp;?</h2>
-      <p>Pour que ces visuels partent sur VOTRE Instagram, il faut connecter votre compte une
-        fois — c'est un appel de quinze minutes, avec moi.</p>
-      <a class="btn btn-plein" id="rdv" href="#" target="_blank" rel="noopener">Réserver l'appel</a>
-      <p class="apres">Quinze minutes. Si ça ne vous convient pas, vous gardez les visuels.</p>
-    </div>
-  </section>
-
-  <footer>Food Boost — La Réunion. Vos visuels vous appartiennent.</footer>
+<div class="w">
+<h1>Dix exemples, dix vraies adresses</h1>
+<p class="s">Chaque feed est monté avec les photos du restaurant lui-même, relevées sur son propre site.
+Aucune image achetée, aucune publication réelle.</p>
+<div class="g">
+  <a class="c" href="diana-dea-lodge/">
+    <span class="im" style="background-image:url('diana-dea-lodge/photos/p01.jpg')"></span>
+    <span class="t">Diana Dea Lodge</span>
+    <span class="q">Saint-Benoît · 7 photos à eux</span>
+  </a>
+  <a class="c" href="mafate-cafe/">
+    <span class="im" style="background-image:url('mafate-cafe/photos/p01.jpg')"></span>
+    <span class="t">Mafate Café</span>
+    <span class="q">Saint-Denis · 9 photos à eux</span>
+  </a>
+  <a class="c" href="le-nautile-beach-hotel/">
+    <span class="im" style="background-image:url('le-nautile-beach-hotel/photos/p01.jpg')"></span>
+    <span class="t">Le Nautile beach Hotel</span>
+    <span class="q">La Saline Le Bains · 9 photos à eux</span>
+  </a>
+  <a class="c" href="coffee-and-travel-974/">
+    <span class="im" style="background-image:url('coffee-and-travel-974/photos/p01.jpg')"></span>
+    <span class="t">Coffee and Travel 974</span>
+    <span class="q">Saint-Pierre · 4 photos à eux</span>
+  </a>
+  <a class="c" href="otent-ik-pizza/">
+    <span class="im" style="background-image:url('otent-ik-pizza/photos/p01.jpg')"></span>
+    <span class="t">Otent'ik Pizza</span>
+    <span class="q">Saint-Pierre · 9 photos à eux</span>
+  </a>
+  <a class="c" href="ryokai-cafe-cafe-a-chats/">
+    <span class="im" style="background-image:url('ryokai-cafe-cafe-a-chats/photos/p01.jpg')"></span>
+    <span class="t">Ryokaï Café - Café à chats</span>
+    <span class="q">Saint-Denis · 8 photos à eux</span>
+  </a>
+  <a class="c" href="le-ti-mezze/">
+    <span class="im" style="background-image:url('le-ti-mezze/photos/p01.jpg')"></span>
+    <span class="t">Le Ti Mezze</span>
+    <span class="q">Saint-Paul · 9 photos à eux</span>
+  </a>
+  <a class="c" href="bodega-saint-pierre/">
+    <span class="im" style="background-image:url('bodega-saint-pierre/photos/p01.jpg')"></span>
+    <span class="t">Bodega saint pierre</span>
+    <span class="q">Saint Pierre · 5 photos à eux</span>
+  </a>
+  <a class="c" href="la-casa-blanca/">
+    <span class="im" style="background-image:url('la-casa-blanca/photos/p01.jpg')"></span>
+    <span class="t">La Casa Blanca</span>
+    <span class="q">Saint-Denis · 9 photos à eux</span>
+  </a>
+  <a class="c" href="kazkfe/">
+    <span class="im" style="background-image:url('kazkfe/photos/p01.jpg')"></span>
+    <span class="t">Kazkfe</span>
+    <span class="q">Saint-Pierre · 9 photos à eux</span>
+  </a>
 </div>
-
-<script>
-/* ══════════════════════════════════════════════════════════════════════════
-   Le parcours, en trois écrans.
-
-   Les neuf tuiles sont générées UNE PAR UNE, en pleine résolution, et posées
-   dans un profil dont l'en-tête et les stories sont écrits en HTML. Demander
-   au modèle de dessiner le profil entier dans une seule image donnait ~230 px
-   par case : neuf miniatures grossières et une typographie qui bave. Ici la
-   typo de l'en-tête est nette, et elle ne peut rien inventer.
-
-   Le navigateur laisse passer six requêtes à la fois et met les autres en
-   file : comptez deux à trois minutes pour les neuf.
-   ══════════════════════════════════════════════════════════════════════════ */
-var MOTEUR = 'https://n7n.automatisationboost.com/webhook/feed-tuile';
-var RENDEZVOUS = '';   // lien de prise de rendez-vous (Calendly ou autre)
-
-(function () {
-  var reduit = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var form = document.getElementById('form');
-  var formMail = document.getElementById('form-mail');
-  var envoyer = document.getElementById('envoyer');
-  var genPost = document.getElementById('genPost');
-  var r1 = document.getElementById('retour1');
-  var r2 = document.getElementById('retour2');
-  var r3 = document.getElementById('retour3');
-  var grille = document.getElementById('grille');
-  var compte = document.getElementById('compte');
-  var demande = {}, urls = new Array(9).fill(null), finis = 0, ratees = 0;
-
-  var ouvrir = function (n) {
-    ['e1','e2','e3'].forEach(function (id, i) {
-      document.getElementById(id).classList.toggle('ouvert', i === n - 1);
-      document.getElementById('f' + (i + 1)).classList.toggle('faite', i < n);
-    });
-    window.scrollTo({ top: 0, behavior: reduit ? 'auto' : 'smooth' });
-  };
-
-  if (RENDEZVOUS) document.getElementById('rdv').href = RENDEZVOUS;
-  else document.getElementById('rdv').addEventListener('click', function (e) {
-    e.preventDefault();
-    alert('Le lien de rendez-vous n’est pas encore renseigné.');
-  });
-
-  var appeler = function (extra) {
-    return fetch(MOTEUR, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.assign({}, demande, extra))
-    }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); });
-  };
-
-  /* L'en-tête du profil : leurs mots, pas les nôtres. Les initiales tiennent
-     lieu de logo tant qu'ils ne nous en ont pas donné un — inventer un
-     emblème serait leur mettre une marque qui n'est pas la leur. */
-  var poserTete = function () {
-    var nom = demande.etablissement || 'Votre établissement';
-    document.getElementById('pNom').textContent = nom;
-    document.getElementById('pBio').textContent =
-      (demande.ville ? demande.ville + ' · ' : '') + [demande.plat1, demande.plat2, demande.plat3]
-        .filter(Boolean).join(' · ');
-    document.getElementById('pastille').textContent =
-      nom.split(/\s+/).filter(Boolean).slice(0, 2).map(function (m) { return m[0]; }).join('').toUpperCase();
-    var st = document.getElementById('stories');
-    st.innerHTML = '';
-    [demande.plat1, demande.plat2, demande.plat3, 'Ambiance', 'Coulisses', 'Avis']
-      .filter(Boolean).forEach(function (t) {
-        var i = document.createElement('i'); i.textContent = String(t).slice(0, 10); st.appendChild(i);
-      });
-  };
-
-  var poser = function (n, url) {
-    var c = grille.children[n];
-    if (!c || c.classList.contains('prete')) return;
-    c.classList.add('prete');
-    var im = new Image(); im.src = url; im.alt = ''; c.appendChild(im);
-    urls[n] = url; finis++;
-    compte.textContent = finis;
-    if (finis + ratees >= 9) montrer();
-  };
-
-  /* Une tuile ratée sort du compte : sinon l'écran reste figé sur « 7 sur 9 »
-     pour toujours et le visiteur ne voit jamais son feed. */
-  var marquerRatee = function (n) {
-    var c = grille.children[n];
-    if (c) { c.classList.add('prete'); c.style.opacity = '.35'; }
-    ratees++;
-    if (finis + ratees >= 9) montrer();
-  };
-
-  var uneTuile = function (n) {
-    return appeler({ mode: 'tuile', n: n })
-      .then(function (j) { if (j && j.url) poser(n, j.url); else marquerRatee(n); })
-      .catch(function () { marquerRatee(n); });
-  };
-
-  var montre = false;
-  var montrer = function () {
-    if (montre) return; montre = true;
-    if (!urls.filter(Boolean).length) {
-      r1.textContent = 'Aucune image n’a pu être générée. Réessayez.'; ouvrir(1); return;
-    }
-    /* On déplace le profil entier sur l'écran 3 : mêmes tuiles, aucun
-       rechargement, donc aucune image qui clignote. */
-    document.getElementById('profilFinal').innerHTML = document.getElementById('profil').innerHTML;
-    document.getElementById('titre-res').textContent =
-      'Voilà le compte de ' + (demande.etablissement || 'votre établissement') + '.';
-    ouvrir(3);
-  };
-
-  form.addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    if (!form.checkValidity()) {
-      r1.textContent = 'Il manque un champ — vérifiez les lignes ci-dessus.';
-      var premier = form.querySelector(':invalid'); if (premier) premier.focus();
-      return;
-    }
-    demande = Object.fromEntries(new FormData(form));
-    delete demande.typepost;
-    urls = new Array(9).fill(null); finis = 0; ratees = 0; montre = false;
-    compte.textContent = '0';
-    Array.prototype.forEach.call(grille.children, function (c) { c.className = ''; c.innerHTML = ''; c.style.opacity = ''; });
-    r1.textContent = '';
-    poserTete();
-    ouvrir(2);
-    for (var i = 0; i < 9; i++) uneTuile(i);
-  });
-
-  genPost.addEventListener('click', function () {
-    var choisi = document.querySelector('input[name="typepost"]:checked');
-    var type = choisi ? choisi.value : 'plat';
-    var zone = document.getElementById('zonePost');
-    var img = document.getElementById('imgPost');
-    genPost.disabled = true; genPost.textContent = 'On le fabrique…';
-    r3.textContent = 'Une minute et demie environ.';
-    img.removeAttribute('src');
-    zone.hidden = false; zone.classList.add('travail');
-    appeler({ mode: 'post', type: type })
-      .then(function (j) {
-        if (!j || !j.url) throw new Error('pas d’URL');
-        img.src = j.url; zone.classList.remove('travail');
-        r3.textContent = 'Voilà. Choisissez-en un autre si vous voulez.';
-      })
-      .catch(function () {
-        zone.hidden = true; zone.classList.remove('travail');
-        r3.textContent = 'Ce post n’a pas pu être généré. Réessayez.';
-      })
-      .then(function () { genPost.disabled = false; genPost.textContent = 'Générer ce post'; });
-  });
-
-  var EMAIL = '';
-  formMail.addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    if (!formMail.checkValidity()) { r2.textContent = 'Il manque une adresse valide.'; return; }
-    if (!EMAIL) {
-      r2.textContent = 'L’envoi par email n’est pas encore branché — restez sur la page, les visuels arrivent.';
-      return;
-    }
-    envoyer.disabled = true; envoyer.textContent = 'Envoi…';
-    fetch(EMAIL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(Object.assign({}, demande, { email: formMail.email.value })) })
-      .then(function (r) { if (!r.ok) throw new Error(r.status); })
-      .then(function () { r2.textContent = 'C’est noté. Vous recevez le lien dès que c’est prêt.'; formMail.reset(); })
-      .catch(function () { r2.textContent = 'L’envoi n’a pas abouti. Réessayez.'; })
-      .then(function () { envoyer.disabled = false; envoyer.textContent = 'Envoyez-le moi'; });
-  });
-})();
-</script>
-</body>
-</html>
+</div>
