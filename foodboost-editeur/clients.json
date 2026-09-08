@@ -1,0 +1,157 @@
+{
+ "diana-dea-lodge": {
+  "nom": "Diana Dea Lodge",
+  "source": "www.diana-dea-lodge.re",
+  "photos": [
+   "../demo/diana-dea-lodge/photos/p01.jpg",
+   "../demo/diana-dea-lodge/photos/p02.jpg",
+   "../demo/diana-dea-lodge/photos/p03.jpg",
+   "../demo/diana-dea-lodge/photos/p04.jpg",
+   "../demo/diana-dea-lodge/photos/p05.jpg",
+   "../demo/diana-dea-lodge/photos/p06.jpg",
+   "../demo/diana-dea-lodge/photos/p07.jpg"
+  ]
+ },
+ "mafate-cafe": {
+  "nom": "Mafate Café",
+  "source": "www.mafatecafe.com",
+  "photos": [
+   "../demo/mafate-cafe/photos/p01.jpg",
+   "../demo/mafate-cafe/photos/p02.jpg",
+   "../demo/mafate-cafe/photos/p03.jpg",
+   "../demo/mafate-cafe/photos/p04.jpg",
+   "../demo/mafate-cafe/photos/p05.jpg",
+   "../demo/mafate-cafe/photos/p06.jpg",
+   "../demo/mafate-cafe/photos/p07.jpg",
+   "../demo/mafate-cafe/photos/p08.jpg",
+   "../demo/mafate-cafe/photos/p09.jpg"
+  ]
+ },
+ "le-nautile-beach-hotel": {
+  "nom": "Le Nautile beach Hotel",
+  "source": "www.hotel-nautile.com",
+  "photos": [
+   "../demo/le-nautile-beach-hotel/photos/p01.jpg",
+   "../demo/le-nautile-beach-hotel/photos/p02.jpg",
+   "../demo/le-nautile-beach-hotel/photos/p03.jpg",
+   "../demo/le-nautile-beach-hotel/photos/p04.jpg",
+   "../demo/le-nautile-beach-hotel/photos/p05.jpg",
+   "../demo/le-nautile-beach-hotel/photos/p06.jpg",
+   "../demo/le-nautile-beach-hotel/photos/p07.jpg",
+   "../demo/le-nautile-beach-hotel/photos/p08.jpg",
+   "../demo/le-nautile-beach-hotel/photos/p09.jpg"
+  ]
+ },
+ "coffee-and-travel-974": {
+  "nom": "Coffee and Travel 974",
+  "source": "www.coffeeandtravel.re",
+  "photos": [
+   "../demo/coffee-and-travel-974/photos/p01.jpg",
+   "../demo/coffee-and-travel-974/photos/p02.jpg",
+   "../demo/coffee-and-travel-974/photos/p03.jpg",
+   "../demo/coffee-and-travel-974/photos/p04.jpg"
+  ]
+ },
+ "otent-ik-pizza": {
+  "nom": "Otent'ik Pizza",
+  "source": "www.otentikpizza.com",
+  "photos": [
+   "../demo/otent-ik-pizza/photos/p01.jpg",
+   "../demo/otent-ik-pizza/photos/p02.jpg",
+   "../demo/otent-ik-pizza/photos/p03.jpg",
+   "../demo/otent-ik-pizza/photos/p04.jpg",
+   "../demo/otent-ik-pizza/photos/p05.jpg",
+   "../demo/otent-ik-pizza/photos/p06.jpg",
+   "../demo/otent-ik-pizza/photos/p07.jpg",
+   "../demo/otent-ik-pizza/photos/p08.jpg",
+   "../demo/otent-ik-pizza/photos/p09.jpg"
+  ]
+ },
+ "ryokai-cafe-cafe-a-chats": {
+  "nom": "Ryokaï Café - Café à chats",
+  "source": "ryokaicafe.re",
+  "photos": [
+   "../demo/ryokai-cafe-cafe-a-chats/photos/p01.jpg",
+   "../demo/ryokai-cafe-cafe-a-chats/photos/p02.jpg",
+   "../demo/ryokai-cafe-cafe-a-chats/photos/p03.jpg",
+   "../demo/ryokai-cafe-cafe-a-chats/photos/p04.jpg",
+   "../demo/ryokai-cafe-cafe-a-chats/photos/p05.jpg",
+   "../demo/ryokai-cafe-cafe-a-chats/photos/p06.jpg",
+   "../demo/ryokai-cafe-cafe-a-chats/photos/p07.jpg",
+   "../demo/ryokai-cafe-cafe-a-chats/photos/p08.jpg"
+  ]
+ },
+ "le-ti-mezze": {
+  "nom": "Le Ti Mezze",
+  "source": "www.letimezze.re",
+  "photos": [
+   "../demo/le-ti-mezze/photos/p01.jpg",
+   "../demo/le-ti-mezze/photos/p02.jpg",
+   "../demo/le-ti-mezze/photos/p03.jpg",
+   "../demo/le-ti-mezze/photos/p04.jpg",
+   "../demo/le-ti-mezze/photos/p05.jpg",
+   "../demo/le-ti-mezze/photos/p06.jpg",
+   "../demo/le-ti-mezze/photos/p07.jpg",
+   "../demo/le-ti-mezze/photos/p08.jpg",
+   "../demo/le-ti-mezze/photos/p09.jpg"
+  ]
+ },
+ "bodega-saint-pierre": {
+  "nom": "Bodega saint pierre",
+  "source": "www.labodegasaintpierre.com",
+  "photos": [
+   "../demo/bodega-saint-pierre/photos/p01.jpg",
+   "../demo/bodega-saint-pierre/photos/p02.jpg",
+   "../demo/bodega-saint-pierre/photos/p03.jpg",
+   "../demo/bodega-saint-pierre/photos/p04.jpg",
+   "../demo/bodega-saint-pierre/photos/p05.jpg"
+  ]
+ },
+ "la-casa-blanca": {
+  "nom": "La Casa Blanca",
+  "source": "lacasablanca.re",
+  "photos": [
+   "../demo/la-casa-blanca/photos/p01.jpg",
+   "../demo/la-casa-blanca/photos/p02.jpg",
+   "../demo/la-casa-blanca/photos/p03.jpg",
+   "../demo/la-casa-blanca/photos/p04.jpg",
+   "../demo/la-casa-blanca/photos/p05.jpg",
+   "../demo/la-casa-blanca/photos/p06.jpg",
+   "../demo/la-casa-blanca/photos/p07.jpg",
+   "../demo/la-casa-blanca/photos/p08.jpg",
+   "../demo/la-casa-blanca/photos/p09.jpg"
+  ]
+ },
+ "kazkfe": {
+  "nom": "Kazkfe",
+  "source": "kazkfe.re",
+  "photos": [
+   "../demo/kazkfe/photos/p01.jpg",
+   "../demo/kazkfe/photos/p02.jpg",
+   "../demo/kazkfe/photos/p03.jpg",
+   "../demo/kazkfe/photos/p04.jpg",
+   "../demo/kazkfe/photos/p05.jpg",
+   "../demo/kazkfe/photos/p06.jpg",
+   "../demo/kazkfe/photos/p07.jpg",
+   "../demo/kazkfe/photos/p08.jpg",
+   "../demo/kazkfe/photos/p09.jpg"
+  ]
+ },
+ "arbradelis": {
+  "nom": "l’ArbraDelis’",
+  "source": "leur site",
+  "photos": [
+   "../demo/arbradelis/photos/eux1.jpg",
+   "../demo/arbradelis/photos/eux2.jpg",
+   "../demo/arbradelis/photos/eux3.jpg",
+   "../demo/arbradelis/photos/eux4.jpg",
+   "../demo/arbradelis/photos/eux5.jpg",
+   "../demo/arbradelis/photos/plat1.jpg",
+   "../demo/arbradelis/photos/plat2.jpg",
+   "../demo/arbradelis/photos/plat3.jpg",
+   "../demo/arbradelis/photos/plat4.jpg",
+   "../demo/arbradelis/photos/plat5.jpg",
+   "../demo/arbradelis/photos/plat6.jpg"
+  ]
+ }
+}

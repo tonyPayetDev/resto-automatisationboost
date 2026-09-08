@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Éditeur de feed — FoodBoost</title>
+<style>
+/* Éditeur de maquette de feed. On clique une vignette, on change sa photo ou
+   son texte, on change la charte — et on envoie la composition à planifier.
+   Tout est local au navigateur : rien ne part tant qu'on n'appuie pas. */
+@font-face{font-family:Anton;src:url(fonts/anton-latin-400-normal.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Sora;font-weight:400;src:url(fonts/sora-latin-400-normal.woff2) format('woff2');font-display:swap}
+@font-face{font-family:Sora;font-weight:700;src:url(fonts/sora-latin-700-normal.woff2) format('woff2');font-display:swap}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ui-fond:#0F1113; --ui-panneau:#181B1E; --ui-trait:#2A2F34;
+  --ui-texte:#EDEFF1; --ui-doux:#9AA2AA; --ui-vif:#FF8A2B;
+  /* la charte du client, pilotée par le sélecteur d'ambiance */
+  --fond:#1E2124; --fond2:#17191B; --accent:#FF8A2B; --clair:#FFFFFF;
+}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--ui-fond);color:var(--ui-texte);
+  font:400 15px/1.55 Sora,ui-sans-serif,system-ui,sans-serif;
+  padding-bottom:env(safe-area-inset-bottom)}
+::selection{background:var(--ui-vif);color:#140C02}
+#suite{margin:16px 0 4px;padding:18px;border-radius:14px;
+  background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1)}
+#suite .suite-t{font-size:17px;font-weight:700;margin-bottom:6px}
+#suite .suite-p{font-size:14px;opacity:.82;line-height:1.55;margin-bottom:14px}
+#suite .suite-b{display:block;text-align:center;padding:14px 16px;border-radius:11px;
+  font-size:15px;font-weight:700;text-decoration:none;margin-bottom:9px}
+#suite .suite-x{font-size:13px;opacity:.7;text-align:center;margin-top:4px}
+#suite .suite-x a{color:inherit}
+#dlg-det{margin-top:14px}
+#dlg-det summary{cursor:pointer;font-size:13px;opacity:.65;padding:6px 0}
+#dlg-det pre{margin-top:8px}
+:where(button,select,input,[contenteditable]):focus-visible{
+  outline:2.5px solid var(--ui-vif);outline-offset:2px;border-radius:3px}
+html{scrollbar-color:#2A2F34 var(--ui-fond)}
+
+header{position:sticky;top:0;z-index:30;background:rgba(15,17,19,.92);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--ui-trait)}
+.bar{max-width:1180px;margin-inline:auto;padding:14px 18px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.marque{font-weight:700;font-size:1.05rem;letter-spacing:-.01em}
+.marque em{font-style:normal;color:var(--ui-vif)}
+.grandir{flex:1}
+label.champ{display:flex;align-items:center;gap:8px;font-size:.83rem;color:var(--ui-doux)}
+select,input[type=text]{background:#101315;color:var(--ui-texte);border:1px solid var(--ui-trait);
+  border-radius:6px;padding:9px 11px;font:inherit;font-size:.87rem;min-height:40px}
+button{font:inherit;cursor:pointer;border:0;border-radius:6px;min-height:44px;padding:0 18px;
+  font-weight:700;font-size:.9rem;transition:transform .16s cubic-bezier(.2,.8,.3,1),filter .16s}
+button:hover{transform:translateY(-1px)}
+button:active{transform:none}
+.primaire{background:var(--ui-vif);color:#160D02}
+.second{background:#1E2327;color:var(--ui-texte);border:1px solid var(--ui-trait)}
+
+main{max-width:1180px;margin-inline:auto;padding:22px 18px 120px;
+  display:grid;gap:26px;grid-template-columns:1fr}
+@media (min-width:62rem){main{grid-template-columns:minmax(0,420px) 1fr;align-items:start}}
+
+/* ── l'aperçu, aux couleurs du client ─────────────────────────────── */
+.apercu{background:var(--fond);border:1px solid var(--ui-trait);border-radius:10px;
+  overflow:hidden;position:sticky;top:76px}
+.tete{padding:20px 20px 14px;color:var(--clair)}
+.tligne{display:flex;align-items:center;gap:14px}
+.pp{width:62px;height:62px;border-radius:50%;object-fit:cover;flex:none;
+  border:2px solid rgba(255,255,255,.16)}
+.tid h2{font-family:Sora;font-size:1.15rem;font-weight:700;letter-spacing:-.01em}
+.tid p{font-size:.8rem;opacity:.72;margin-top:3px;line-height:1.35}
+.sto{display:flex;gap:14px;margin-top:16px}
+.sto div{text-align:center;width:52px}
+.sto i{display:block;width:52px;height:52px;border-radius:50%;overflow:hidden;
+  border:2px solid var(--accent);padding:2px}
+.sto i img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block}
+.sto span{display:block;margin-top:5px;font-size:.62rem;opacity:.72}
+
+.grille{display:grid;grid-template-columns:repeat(3,1fr)}
+.v{position:relative;aspect-ratio:9/16;overflow:hidden;cursor:pointer;
+  background:var(--fond2);color:var(--clair)}
+.v>img{width:100%;height:100%;object-fit:cover;display:block}
+.v.actif{outline:3px solid var(--ui-vif);outline-offset:-3px;z-index:2}
+.v .voile{position:absolute;inset:0}
+.v .voile img{width:100%;height:100%;object-fit:cover;filter:saturate(.72) brightness(.42)}
+.v .voile::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.5),rgba(0,0,0,.26) 38%,rgba(0,0,0,.86))}
+.v .mot{position:absolute;left:9%;right:9%;top:50%;transform:translateY(-50%);z-index:1}
+.v .mot b{font-family:Anton;font-weight:400;display:block;
+  font-size:clamp(.72rem,2.4vw,1.05rem);line-height:1.1}
+.v .mot b em{font-style:normal;color:var(--accent)}
+.v .mot hr{width:24px;height:2px;background:var(--accent);border:0;margin-top:7px}
+.v .bas{position:absolute;left:9%;right:9%;bottom:7%;z-index:1}
+.v .bas b{font-family:Anton;font-weight:400;display:block;
+  font-size:clamp(.66rem,2.2vw,.95rem);line-height:1.1;text-shadow:0 2px 12px rgba(0,0,0,.85)}
+.v .bas b em{font-style:normal;color:var(--accent)}
+.v .carte{position:absolute;left:7%;right:7%;bottom:6%;z-index:2;
+  background:rgba(10,10,12,.86);border:1px solid rgba(255,255,255,.14);padding:7px 8px}
+.v .carte h4{font-size:.5rem;letter-spacing:.18em;color:var(--accent);
+  text-transform:uppercase;margin-bottom:4px;font-weight:700}
+.v .carte li{list-style:none;font-size:.6rem;line-height:1.6;
+  display:flex;gap:5px;align-items:baseline}
+.v .carte li i{flex:1;border-bottom:1px dotted rgba(255,255,255,.28);transform:translateY(-3px)}
+.v .play{position:absolute;right:7%;top:6%;z-index:3;width:20px;height:20px;
+  border:2px solid rgba(255,255,255,.92);border-radius:50%;background:rgba(0,0,0,.34)}
+.v .play::after{content:"";position:absolute;left:6px;top:4px;
+  border-left:7px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent}
+.v .sig{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:6px;padding:0 8px;text-align:center;z-index:1}
+.v .sig b{font-family:Sora;font-weight:700;font-size:clamp(.6rem,1.9vw,.82rem);line-height:1.25}
+.v .sig b em{font-style:normal;color:var(--accent);display:block}
+
+/* ── le panneau de réglage ────────────────────────────────────────── */
+.panneau{display:grid;gap:18px}
+.bloc{background:var(--ui-panneau);border:1px solid var(--ui-trait);border-radius:10px;padding:18px}
+.bloc h3{font-size:.95rem;font-weight:700;margin-bottom:4px}
+.bloc p.aide{font-size:.82rem;color:var(--ui-doux);margin-bottom:14px;line-height:1.5}
+.rangee{display:grid;gap:12px;grid-template-columns:1fr}
+@media (min-width:34rem){.rangee.deux{grid-template-columns:1fr 1fr}}
+.rangee label{display:grid;gap:5px;font-size:.78rem;color:var(--ui-doux)}
+.vide{color:var(--ui-doux);font-size:.85rem}
+
+.banque{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;
+  max-height:300px;overflow-y:auto;padding-right:4px}
+.banque img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:5px;cursor:pointer;
+  border:2px solid transparent;transition:border-color .15s}
+.banque img:hover{border-color:var(--ui-vif)}
+
+.edit{background:#101315;border:1px solid var(--ui-trait);border-radius:6px;
+  padding:10px 11px;min-height:44px;font:inherit;font-size:.87rem;color:var(--ui-texte)}
+.edit:empty::before{content:attr(data-vide);color:var(--ui-doux)}
+
+.pied{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(15,17,19,.94);
+  backdrop-filter:blur(10px);border-top:1px solid var(--ui-trait);
+  padding:12px 18px calc(12px + env(safe-area-inset-bottom))}
+.pied .bar{padding:0;gap:10px}
+.etat{font-size:.8rem;color:var(--ui-doux)}
+.etat b{color:var(--ui-texte)}
+dialog{border:0;border-radius:12px;background:var(--ui-panneau);color:var(--ui-texte);
+  max-width:520px;width:calc(100% - 36px);padding:22px}
+dialog::backdrop{background:rgba(0,0,0,.66)}
+dialog h3{font-size:1.05rem;margin-bottom:8px}
+dialog p{font-size:.87rem;color:var(--ui-doux);line-height:1.55;margin-bottom:14px}
+dialog pre{background:#0C0F11;border:1px solid var(--ui-trait);border-radius:7px;
+  padding:12px;font-size:.72rem;overflow:auto;max-height:230px;color:#C8D0D6}
+
+.destination{background:#101a17;border:1px solid #1f4a41;border-radius:12px;
+  padding:15px 17px;margin-top:14px;display:flex;flex-direction:column;gap:9px}
+.destination .t{font:700 11px/1 ui-monospace,monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:#4fd1b5}
+.destination .cible{font-size:16px;font-weight:650}
+.destination .cible span{color:#9aa4b8;font-weight:400;font-size:14px}
+.destination .tags{display:flex;flex-wrap:wrap;gap:6px}
+.destination .tags b{font:600 12.5px/1 ui-monospace,monospace;color:#9fe8d6;
+  background:#0c1614;border:1px solid #1f4a41;border-radius:99px;padding:6px 10px}
+.destination .avert{font-size:13px;line-height:1.5;color:#e8c98a;
+  background:#1d1706;border:1px solid #443814;border-radius:9px;padding:10px 12px}
+
+.banque-titre{font:700 11px/1 ui-monospace,monospace;letter-spacing:.16em;
+  text-transform:uppercase;color:#9aa4b8;margin:14px 0 8px;display:flex;
+  align-items:center;gap:9px}
+.banque-titre b{color:#4fd1b5;font-weight:700}
+.banque-titre.client b{color:#e8c98a}
+.banque-titre em{font-style:normal;font-weight:400;color:#6b7089;font-size:11px;
+  letter-spacing:0;text-transform:none}
+
+.creneau{display:flex;gap:10px;margin-top:11px;flex-wrap:wrap}
+.creneau label{flex:1;min-width:132px;display:flex;flex-direction:column;gap:5px;
+  font-size:12.5px;color:#9aa4b8}
+.creneau input{font:inherit;font-size:15px;color:#eceef5;background:#0c1614;
+  border:1px solid #1f4a41;border-radius:9px;padding:11px 12px;min-height:46px}
+.creneau input:focus{outline:0;border-color:#3dc4c2}
+.creneau .quand{flex:0 0 100%;font-size:12.8px;color:#6b7089;line-height:1.5}
+
+/* ── L'atelier : sur écran large c'est une colonne, sur téléphone une feuille
+      qui monte du bas quand on touche une vignette. Sans ça, toucher une
+      vignette ne montrait rien : les réglages étaient deux écrans plus bas. ── */
+.atelier-tete{display:none}
+.atelier-corps{display:grid;gap:18px}
+button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
+
+.legende-lab{display:grid;gap:6px;font-size:.78rem;color:var(--ui-doux);margin-top:14px}
+#legende{background:#101315;color:var(--ui-texte);border:1px solid var(--ui-trait);
+  border-radius:8px;padding:11px 12px;font:inherit;font-size:.9rem;line-height:1.5;
+  resize:vertical;min-height:96px}
+.bascule{display:flex;gap:11px;align-items:flex-start;margin-top:16px;
+  background:#141013;border:1px solid #3a2a1a;border-radius:10px;padding:13px 14px;
+  font-size:.84rem;line-height:1.5;color:var(--ui-doux);cursor:pointer}
+.bascule input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--ui-vif)}
+.bascule b{color:var(--ui-texte)}
+.bascule em{font-style:normal;display:block;margin-top:3px;color:#8fbf9f}
+.bascule.on{border-color:#7a4a12;background:#1d1206}
+.bascule.on em{color:#f0b45c}
+
+/* Le récapitulatif collé sous le bouton d'envoi. */
+.recap{max-width:1180px;margin:10px auto 0;display:flex;align-items:center;gap:10px;
+  background:#101a17;border:1px solid #1f4a41;border-radius:10px;padding:9px 11px}
+.recap-vig{width:30px;height:53px;object-fit:cover;border-radius:5px;flex:none;background:#000}
+.recap-txt{font-size:.78rem;line-height:1.45;color:#9fe8d6}
+.recap-txt b{color:#eafff8;font-weight:650}
+
+/* La fenêtre de confirmation. */
+.conf-grille{display:flex;gap:14px;align-items:flex-start}
+.conf-media{width:104px;height:185px;flex:none;border-radius:8px;overflow:hidden;
+  border:1px solid var(--ui-trait);background:var(--fond);position:relative}
+/* La grille est clonée telle quelle puis réduite : à 104 px de large, les
+   tailles de police en clamp() s'effondrent et le texte se chevauche. Une
+   mise à l'échelle garde les proportions exactes du vrai média. */
+.conf-media .grille{position:absolute;top:0;left:0;width:312px;
+  display:grid;grid-template-columns:repeat(3,1fr);
+  transform:scale(.3333);transform-origin:0 0}
+.conf-media .v{pointer-events:none}
+.conf-detail{flex:1;display:grid;gap:9px;min-width:0}
+.conf-l span{display:block;font:700 10px/1 ui-monospace,monospace;letter-spacing:.14em;
+  text-transform:uppercase;color:#6b7089;margin-bottom:4px}
+.conf-l b{font-size:.86rem;font-weight:600;color:var(--ui-texte);word-break:break-word}
+.conf-leg{background:#0C0F11;border:1px solid var(--ui-trait);border-radius:7px;padding:11px 12px;
+  font-size:.83rem;line-height:1.55;color:#C8D0D6;white-space:pre-wrap;max-height:180px;overflow:auto}
+#dlg-conf p{margin-bottom:14px}
+#dlg-conf p.chaud{color:#f0b45c;background:#1d1206;border:1px solid #443814;
+  border-radius:9px;padding:10px 12px}
+
+@media (max-width:61.99rem){
+  /* La feuille. Elle ne s'ouvre que sur sélection : le reste du temps la page
+     se lit comme avant, sans panneau mort qui prend la moitié de l'écran. */
+  #atelier{position:fixed;left:0;right:0;bottom:0;z-index:60;
+    background:var(--ui-panneau);border-top:1px solid var(--ui-trait);
+    border-radius:16px 16px 0 0;box-shadow:0 -18px 44px rgba(0,0,0,.6);
+    transform:translateY(101%);transition:transform .26s cubic-bezier(.2,.8,.3,1);
+    max-height:58vh;display:flex;flex-direction:column}
+  body.atelier-ouvert #atelier{transform:none}
+  .atelier-tete{display:flex;align-items:center;gap:12px;padding:13px 16px 11px;
+    border-bottom:1px solid var(--ui-trait);position:relative}
+  .atelier-tete::before{content:"";position:absolute;top:6px;left:50%;transform:translateX(-50%);
+    width:38px;height:4px;border-radius:99px;background:#3a4046}
+  .atelier-titre{font-weight:700;font-size:.92rem;flex:1}
+  .atelier-corps{overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:14px 14px calc(16px + env(safe-area-inset-bottom));gap:14px}
+  #atelier .bloc{border:0;background:transparent;padding:0}
+  #atelier .bloc h3{display:none}
+  .banque{max-height:none;grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+  #voile-atelier{position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.3);
+    opacity:0;pointer-events:none;transition:opacity .26s}
+  body.atelier-ouvert #voile-atelier{opacity:1}
+  /* Pas de verrou de défilement : la feuille ne prend que 58vh, et il faut
+     pouvoir remonter dans la grille — sinon on édite à l'aveugle. */
+  /* La grille reste visible au-dessus de la feuille : on choisit une vignette,
+     on la voit changer sans fermer. */
+  body.atelier-ouvert .apercu{position:static}
+  .v{min-height:0}
+  .edit{min-height:48px;font-size:16px}   /* 16px : iOS n'y zoome pas à la mise au point */
+  #legende{font-size:16px}
+  select,input[type=text],input[type=date],input[type=time]{font-size:16px;min-height:46px}
+  .recap{margin-top:8px;padding:8px 10px}
+  .pied .bar{gap:8px}
+  .pied .bar .etat{flex:0 0 100%;order:-1}
+  .pied button{flex:1}
+  main{padding-bottom:172px}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <span class="marque">FOOD<em>BOOST</em> · éditeur</span>
+    <span class="grandir"></span>
+    <label class="champ">Ambiance
+      <select id="ambiance">
+        <option value="moderne">Moderne et minimaliste</option>
+        <option value="chic">Chic et épurée</option>
+        <option value="tropicale">Tropicale et colorée</option>
+        <option value="chaleureuse">Chaleureuse et familiale</option>
+        <option value="rustique">Rustique et authentique</option>
+      </select>
+    </label>
+  </div>
+</header>
+
+<main>
+  <section class="apercu" id="apercu">
+    <div class="tete">
+      <div class="tligne">
+        <img class="pp" id="pp" alt="">
+        <div class="tid">
+          <h2 id="v-nom">Chez Marlène</h2>
+          <p id="v-bio">Restaurant créole à Saint-Pierre.</p>
+        </div>
+      </div>
+      <div class="sto" id="stories"></div>
+    </div>
+    <div class="grille" id="grille"></div>
+  </section>
+
+  <section class="panneau">
+    <div class="bloc">
+      <h3>L'établissement</h3>
+      <p class="aide">Ce que le client voit en haut de son profil. Aucun chiffre n'est
+        affiché : ni abonnés, ni prix, ni horaires — on ne les invente pas.</p>
+      <div class="rangee deux">
+        <label>Nom<input type="text" id="nom" value="Chez Marlène"></label>
+        <label>Type<input type="text" id="type" value="Restaurant créole"></label>
+        <label>Ville<input type="text" id="ville" value="Saint-Pierre"></label>
+        <label>Famille de photos
+          <select id="famille">
+            <option value="creole">Créole</option>
+            <option value="pizza">Pizza</option>
+            <option value="japonais">Japonais / poké</option>
+            <option value="burger">Burger / grill</option>
+            <option value="snack">Snack / sandwich</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <div id="atelier">
+    <div class="atelier-tete">
+      <span class="atelier-titre" id="atelier-titre">La vignette sélectionnée</span>
+      <button class="second petit" id="fermer-atelier" type="button">Terminé</button>
+    </div>
+    <div class="atelier-corps">
+    <div class="bloc" id="bloc-tuile">
+      <h3>La vignette sélectionnée</h3>
+      <p class="aide" id="aide-tuile">Touche une vignette dans l'aperçu pour la modifier.</p>
+      <div id="reglages-tuile"></div>
+    </div>
+
+    <div class="bloc">
+      <h3>Changer la photo</h3>
+      <p class="aide">Choisis dans la banque, ou envoie celle du client. Une photo
+        téléversée reste dans ce navigateur — elle ne part nulle part tant que tu
+        n'as pas confirmé l'envoi.</p>
+      <div class="rangee">
+        <label>Ta propre photo<input type="file" id="fichier" accept="image/*"></label>
+      </div>
+      <div class="banque" id="banque"></div>
+    </div>
+    </div>
+    </div>
+
+    <div class="bloc" id="bloc-envoi">
+      <h3>Ce qui va partir</h3>
+      <p class="aide">Le récapitulatif ci-dessous est exactement ce qui sera envoyé.
+        Rien ne part avant la confirmation.</p>
+      <div class="destination" id="destination">
+        <span class="t">Destination</span>
+        <span class="cible">Instagram <b>@foodboost</b> <span>· reel 9:16, 9 s</span></span>
+        <div class="tags" id="tags"></div>
+        <div class="creneau">
+          <label>Date de publication<input type="date" id="d-date"></label>
+          <label>Heure<input type="time" id="d-heure" value="18:00"></label>
+          <span class="quand" id="d-quand"></span>
+        </div>
+      </div>
+      <label class="legende-lab">Légende du post
+        <textarea id="legende" rows="4" maxlength="900"></textarea></label>
+      <p class="aide" style="margin:6px 0 0">Les hashtags sont ajoutés à la fin —
+        cinq au maximum, sinon Instagram refuse le post.</p>
+      <label class="bascule">
+        <input type="checkbox" id="auto" disabled>
+        <span><b>Publication directe</b> — le post part sur @foodboost dès que tu confirmes.
+          Décoche si tu préfères que Tony relise avant.
+          <em id="auto-etat">Activé.</em></span>
+      </label>
+    </div>
+  </section>
+  
+</main>
+
+<div id="voile-atelier"></div>
+
+<div class="pied">
+  <div class="bar">
+    <span class="etat" id="etat">Prêt. <b id="compte">0</b> modification(s).</span>
+    <span class="grandir"></span>
+    <button class="second" id="image">Exporter en image</button>
+    <button class="second" id="reinit">Repartir de zéro</button>
+    <input type="email" id="email-client" placeholder="Votre email, pour recevoir le récapitulatif"
+      autocomplete="email" style="flex:1 1 220px;min-width:180px;background:#101018;border:1px solid var(--trait,#26262c);
+      color:inherit;border-radius:9px;padding:11px 12px;font:inherit;font-size:14px">
+    <button class="primaire" id="planifier">Programmer ces publications</button>
+  </div>
+  <!-- « Un petit truc en dessous » : le récapitulatif de ce qui part, collé au
+       bouton, pour qu'on ne l'envoie jamais sans avoir vu la destination. -->
+  <div class="recap" id="recap">
+    <img class="recap-vig" id="recap-vig" alt="">
+    <span class="recap-txt" id="recap-txt"></span>
+  </div>
+</div>
+
+<dialog id="dlg-conf">
+  <h3>Confirmer l'envoi</h3>
+  <p id="conf-mode"></p>
+  <div class="conf-grille">
+    <div class="conf-media" id="conf-media"></div>
+    <div class="conf-detail">
+      <div class="conf-l"><span>Réseau</span><b>Instagram · @foodboost</b></div>
+      <div class="conf-l"><span>Format</span><b>Reel 9:16 · 9 s · au fil aussi</b></div>
+      <div class="conf-l"><span>Créneau</span><b id="conf-creneau"></b></div>
+      <div class="conf-l"><span>Hashtags</span><b id="conf-tags"></b></div>
+    </div>
+  </div>
+  <div class="conf-l" style="display:block;margin-top:12px">
+    <span>Légende</span>
+    <div class="conf-leg" id="conf-leg"></div>
+  </div>
+  <div class="bar" style="padding:16px 0 0">
+    <span class="grandir"></span>
+    <button class="second" id="conf-annuler" type="button">Annuler</button>
+    <button class="primaire" id="conf-ok" type="button">Confirmer l'envoi</button>
+  </div>
+</dialog>
+
+<dialog id="dlg">
+  <h3 id="dlg-t">Composition prête</h3>
+  <p id="dlg-p"></p>
+
+  <div id="suite">
+    <div class="suite-t">Et maintenant&nbsp;?</div>
+    <p class="suite-p">Ce que tu viens de composer, on peut l'installer chez toi&nbsp;:
+      tes plats, ta carte, tes photos — et ça publie tout seul, chaque jour.</p>
+    <a class="suite-b primaire" id="suite-rdv" target="_blank" rel="noopener">Caler un rendez-vous</a>
+    <a class="suite-b second" id="suite-wa" target="_blank" rel="noopener">Écrire à Tony</a>
+    <div class="suite-x">ou par téléphone&nbsp;: <a id="suite-tel" href="tel:+262692417749">0692&nbsp;41&nbsp;77&nbsp;49</a></div>
+  </div>
+
+  <details id="dlg-det">
+    <summary>Voir la composition envoyée</summary>
+    <pre id="dlg-json"></pre>
+    <button class="second" id="dlg-copier" type="button">Copier</button>
+  </details>
+
+  <div class="bar" style="padding:14px 0 0">
+    <span class="grandir"></span>
+    <button class="primaire" id="dlg-fermer">Fermer</button>
+  </div>
+</dialog>
+
+<script src="banque.js"></script>
+<script>
+/* ── Les données. Rien n'est généré ici : les photos viennent de la banque déjà
+      produite, les accroches d'une bibliothèque écrite à l'avance. C'est ce qui
+      permet à une démo de ne coûter ni token ni centime. ─────────────── */
+const PALETTES = {
+  moderne:     { fond:'#1E2124', fond2:'#17191B', accent:'#FF8A2B', clair:'#FFFFFF' },
+  chic:        { fond:'#141414', fond2:'#0D0D0D', accent:'#C6A96B', clair:'#F2F0EB' },
+  tropicale:   { fond:'#123024', fond2:'#0C2119', accent:'#D3A34A', clair:'#F1E9D8' },
+  chaleureuse: { fond:'#3A1710', fond2:'#2C110B', accent:'#D8A23C', clair:'#F6EDE0' },
+  rustique:    { fond:'#2E211A', fond2:'#221812', accent:'#C97B2C', clair:'#EFE3CE' },
+};
+const FAMILLES = {
+  creole: { photos:['02-vitrine--rougail-saucisse','02-vitrine--cari-poulet','01-demo--food-rougail','06-snacking--samoussas','02-vitrine--gateau-patate'],
+    hooks:[['ÇA MIJOTE','DEPUIS CE MATIN.'],['LA SAUCE QUI FAIT',"FINIR L'ASSIETTE."],['TU PENSES CONNAÎTRE','LE ROUGAIL ?']],
+    sig:['LE GOÛT',"D'ICI."], menu:[['Menu du jour',['Rougail saucisse','Cari poulet','Riz · grains']],['À emporter',['Samoussas','Bouchons','Gâteau patate']]] },
+  pizza: { photos:['07-pizza--margherita','07-pizza--calzone','11-grillades--brochettes','03-burger--frites-maison','04-sandwich--club-sandwich'],
+    hooks:[['FAIT AVEC','PASSION.'],['UN BON JOUR','COMMENCE ICI.'],['PRÊT POUR','LA PROCHAINE FOURNÉE ?']],
+    sig:['LA PIZZA.','TOUT SIMPLEMENT.'], menu:[['Menu du jour',['Margherita','Calzone','Reine']],['Ce soir',['Focaccia maison','Antipasti','Tiramisu']]] },
+  japonais: { photos:['08-sushi--california','08-sushi--sashimi','05-poke--poke-saumon','05-poke--poke-thon-epice','05-poke--bowl-exotique'],
+    hooks:[['LE POISSON','NE MENT PAS.'],['ICI, ON COUPE','À LA MINUTE.'],['TU CONNAIS','LA VRAIE DIFFÉRENCE ?']],
+    sig:['LE GESTE.','RIEN DE PLUS.'], menu:[['Au comptoir',['Sashimi du jour','Makis maison','Chirashi']],['Ce soir',['Poké saumon','Edamame','Mochi']]] },
+  burger: { photos:['03-burger--burger-bacon-bbq','03-burger--burger-cheddar','03-burger--frites-maison','04-sandwich--club-sandwich','11-grillades--travers'],
+    hooks:[['LA VIANDE','SAIGNANTE.'],['ON NE TRICHE PAS','SUR LE PAIN.'],['PRÊT À','MORDRE DEDANS ?']],
+    sig:['LE VRAI','BURGER.'], menu:[['Menu du jour',['Cheddar bacon','Poulet croustillant','Frites maison']],['Ce soir',['Double steak','Coleslaw','Brownie']]] },
+  snack: { photos:['06-snacking--samoussas','06-snacking--bonbons-piment','04-sandwich--wrap-poulet','04-sandwich--bagel-saumon','03-burger--frites-maison'],
+    hooks:[['CHAUD,','TOUT DE SUITE.'],['LA PAUSE','QUI FAIT DU BIEN.'],['TU PRENDS QUOI',"AUJOURD'HUI ?"]],
+    sig:['VITE FAIT.','BIEN FAIT.'], menu:[['Menu du jour',['Samoussas','Bouchons','Wrap poulet']],['À emporter',['Bagel saumon','Frites maison','Beignet']]] },
+};
+/* Le plan des 9 vignettes. « p » = index de photo, « r » = rôle.
+   Les 4 tuiles à texte sont en 2, 4, 7 et 9 : dispersées, jamais en colonne —
+   c'est ce qui empêche la grille de se lire comme un catalogue. */
+const PLAN = [
+  {r:'photo', p:0}, {r:'hook', h:0, p:2}, {r:'menu', m:0, p:1},
+  {r:'hook', h:1, p:3, play:1}, {r:'bas', h:2, p:2, play:1}, {r:'photo', p:3},
+  {r:'hook', h:2, p:1, play:1}, {r:'menu', m:1, p:4}, {r:'sig', p:0},
+];
+
+/* Les photos d'un client ne sont plus copiees ici : elles vivent deja sur
+   resto.automatisationboost.com, ou les demos les servent. Les dupliquer
+   dans ce depot ajoutait 32 Mo pour rien — et le disque du VPS a deja bloque
+   des deploiements. url() laisse donc passer une adresse absolue telle quelle. */
+const url = (n) => (n.startsWith('data:') || n.startsWith('http')) ? n : 'photos/' + n + '.jpg';
+let E = null;      // état courant
+let selection = null;
+let modifs = 0;
+
+function neuf(famille) {
+  const F = FAMILLES[famille];
+  return {
+    nom: document.getElementById('nom').value,
+    type: document.getElementById('type').value,
+    ville: document.getElementById('ville').value,
+    ambiance: document.getElementById('ambiance').value,
+    famille,
+    photos: F.photos.slice(),
+    hooks: F.hooks.map((h) => h.slice()),
+    sig: F.sig.slice(),
+    menu: F.menu.map(([t, l]) => [t, l.slice()]),
+  };
+}
+
+function peindre() {
+  const P = PALETTES[E.ambiance];
+  for (const [k, v] of Object.entries(P)) document.documentElement.style.setProperty('--' + k, v);
+  document.getElementById('v-nom').textContent = E.nom || '—';
+  document.getElementById('v-bio').textContent =
+    (E.type || '') + (E.ville ? ' à ' + E.ville : '') + (E.type || E.ville ? '.' : '');
+  document.getElementById('pp').src = url(E.photos[0]);
+
+  document.getElementById('stories').innerHTML = ['Maison','Cuisine','Frais','Partage','Goût']
+    .map((s, i) => `<div><i><img src="${url(E.photos[i])}" alt=""></i><span>${s}</span></div>`).join('');
+
+  document.getElementById('grille').innerHTML = PLAN.map((t, i) => {
+    const ph = url(E.photos[t.p]);
+    const play = t.play ? '<div class="play"></div>' : '';
+    if (t.r === 'photo') return `<div class="v" data-i="${i}"><img src="${ph}" alt=""></div>`;
+    if (t.r === 'hook') return `<div class="v" data-i="${i}"><div class="voile"><img src="${ph}" alt=""></div>
+      <div class="mot"><b>${E.hooks[t.h][0]}<br><em>${E.hooks[t.h][1]}</em></b><hr></div>${play}</div>`;
+    if (t.r === 'bas') return `<div class="v" data-i="${i}"><img src="${ph}" alt="">
+      <div class="bas"><b>${E.hooks[t.h][0]}<br><em>${E.hooks[t.h][1]}</em></b></div>${play}</div>`;
+    if (t.r === 'menu') { const [ti, pl] = E.menu[t.m];
+      return `<div class="v" data-i="${i}"><img src="${ph}" alt="">
+        <div class="carte"><h4>${ti}</h4><ul>${pl.map((d) => `<li>${d}<i></i></li>`).join('')}</ul></div></div>`; }
+    return `<div class="v" data-i="${i}"><div class="voile"><img src="${ph}" alt=""></div>
+      <div class="sig"><b>${E.sig[0]}<em>${E.sig[1]}</em></b></div></div>`;
+  }).join('');
+
+  document.querySelectorAll('.v').forEach((v) => {
+    v.addEventListener('click', () => choisir(+v.dataset.i));
+    if (+v.dataset.i === selection) v.classList.add('actif');
+  });
+  document.getElementById('compte').textContent = modifs;
+}
+
+/* Le panneau s'adapte au rôle de la vignette : on ne propose que ce qui existe
+   dessus, plutôt qu'un formulaire générique où trois champs sur cinq sont morts. */
+function choisir(i) {
+  selection = i;
+  const t = PLAN[i];
+  const zone = document.getElementById('reglages-tuile');
+  const role = ({ photo:'photo seule', hook:'accroche sur fond', bas:'accroche sur la photo',
+       menu:'carte de menu', sig:'carton de signature' })[t.r];
+  document.getElementById('aide-tuile').textContent =
+    'Vignette ' + (i + 1) + ' sur 9 — ' + role + '.';
+  document.getElementById('atelier-titre').textContent =
+    'Vignette ' + (i + 1) + ' — ' + role;
+  ouvrirAtelier();
+
+  if (t.r === 'photo') { zone.innerHTML = '<p class="vide">Rien à écrire ici : choisis une photo ci-dessous.</p>'; peindre(); return; }
+  if (t.r === 'menu') {
+    const [ti, pl] = E.menu[t.m];
+    zone.innerHTML = `<div class="rangee">
+      <label>Titre de la carte<div class="edit" contenteditable data-c="mt">${ti}</div></label>
+      ${pl.map((d, k) => `<label>Ligne ${k + 1}<div class="edit" contenteditable data-c="ml" data-k="${k}">${d}</div></label>`).join('')}
+      </div><p class="aide" style="margin:12px 0 0">Aucun prix : l'email promet qu'on n'invente
+      rien de chiffré sur l'établissement.</p>`;
+  } else if (t.r === 'sig') {
+    zone.innerHTML = `<div class="rangee deux">
+      <label>Ligne 1<div class="edit" contenteditable data-c="s0">${E.sig[0]}</div></label>
+      <label>Ligne 2 (en couleur)<div class="edit" contenteditable data-c="s1">${E.sig[1]}</div></label></div>`;
+  } else {
+    const h = E.hooks[t.h];
+    zone.innerHTML = `<div class="rangee deux">
+      <label>Ligne 1<div class="edit" contenteditable data-c="h0">${h[0]}</div></label>
+      <label>Ligne 2 (en couleur)<div class="edit" contenteditable data-c="h1">${h[1]}</div></label></div>`;
+  }
+  zone.querySelectorAll('[contenteditable]').forEach((el) => {
+    el.addEventListener('input', () => {
+      const t2 = PLAN[selection], v = el.textContent.trim();
+      const c = el.dataset.c;
+      if (c === 'h0') E.hooks[t2.h][0] = v;
+      if (c === 'h1') E.hooks[t2.h][1] = v;
+      if (c === 's0') E.sig[0] = v;
+      if (c === 's1') E.sig[1] = v;
+      if (c === 'mt') E.menu[t2.m][0] = v;
+      if (c === 'ml') E.menu[t2.m][1][+el.dataset.k] = v;
+      modifs++; garder();
+      const g = el.getBoundingClientRect().top;   /* on repeint sans perdre le focus */
+      peindre(); el.focus();
+      if (Math.abs(el.getBoundingClientRect().top - g) > 2) el.scrollIntoView({ block:'nearest' });
+    });
+  });
+  peindre();
+}
+
+/* La banque : cliquer une photo remplace celle de la vignette sélectionnée. */
+function banque(liste, client) {
+  const grille = (l) => l
+    /* `url(n)` et pas un chemin en dur : depuis que les photos d'un client sont
+       servies par resto.automatisationboost, `n` peut etre une adresse absolue.
+       Concatener « photos/ » devant donnait photos/https://….jpg.jpg — neuf 404
+       et un selecteur vide. */
+    .map((n) => `<img src="${url(n)}" data-n="${n}" alt="" loading="lazy">`).join('');
+  const z = document.getElementById('banque');
+  z.innerHTML =
+    (client && client.photos.length
+      ? `<div class="banque-titre client"><b>${client.photos.length} photos</b>
+         de ${client.nom} <em>· prises sur ${client.source}</em></div>`
+        + grille(client.photos)
+        + '<div class="banque-titre"><b>La banque</b> <em>· pour ce qu\'ils n\'ont pas</em></div>'
+      : '')
+    + grille(liste);
+  document.querySelectorAll('#banque img').forEach((im) => {
+    im.addEventListener('click', () => {
+      if (selection === null) { alert('Choisis d\'abord une vignette dans l\'aperçu.'); return; }
+      E.photos[PLAN[selection].p] = im.dataset.n;
+      modifs++; garder(); peindre();
+    });
+  });
+}
+
+const garder = () => { try { localStorage.setItem('fb-editeur', JSON.stringify(E)); } catch (e) {} };
+
+document.getElementById('fichier').addEventListener('change', (ev) => {
+  const f = ev.target.files[0];
+  if (!f) return;
+  if (selection === null) { alert('Choisis d\'abord une vignette dans l\'aperçu.'); ev.target.value = ''; return; }
+  const r = new FileReader();
+  r.onload = () => { E.photos[PLAN[selection].p] = r.result; modifs++; garder(); peindre(); };
+  r.readAsDataURL(f);
+});
+
+for (const id of ['nom', 'type', 'ville']) {
+  document.getElementById(id).addEventListener('input', (e) => {
+    if (!E) return;
+    E[id] = e.target.value; modifs++; garder(); peindre();
+    rafraichirLegende(); peindreTags(); peindreRecap();
+  });
+}
+document.getElementById('ambiance').addEventListener('change', (e) => {
+  if (!E) return;
+  E.ambiance = e.target.value; modifs++; garder(); peindre();
+});
+document.getElementById('famille').addEventListener('change', (e) => {
+  if (!E) return;
+  E = Object.assign(neuf(e.target.value), { nom:E.nom, type:E.type, ville:E.ville, ambiance:E.ambiance });
+  selection = null; modifs++; garder(); peindre();
+  document.getElementById('reglages-tuile').innerHTML = '';
+  document.getElementById('aide-tuile').textContent = 'Touche une vignette dans l\'aperçu pour la modifier.';
+  fermerAtelier(); rafraichirLegende(); peindreTags(); peindreRecap();
+});
+document.getElementById('reinit').addEventListener('click', () => {
+  if (!confirm('Tout remettre comme au départ ?')) return;
+  try { localStorage.removeItem('fb-editeur'); } catch (e) {}
+  E = neuf(document.getElementById('famille').value); selection = null; modifs = 0; peindre();
+});
+
+/* Envoyer : on montre EXACTEMENT ce qui partirait. Rien n'est envoyé
+   automatiquement — la chaîne rendu + planification n'est pas encore branchée,
+   et annoncer « c'est planifié » sans que ce soit vrai serait pire que rien. */
+/* Cinq hashtags maximum : au-delà, Instagram via Blotato rejette le post.
+   On prend donc les cinq qui portent le plus — le métier, la ville, l'île. */
+const sansAccent = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase().replace(/[^a-z0-9]+/g, '');
+const HASH_FAMILLE = {
+  creole: ['cuisinecreole', 'rougail'],
+  pizza: ['pizza', 'pizzeria'],
+  japonais: ['sushi', 'restaurantjaponais'],
+  burger: ['burger', 'streetfood'],
+  snack: ['snack', 'streetfood'],
+};
+const calculerTags = () => {
+  const ville = sansAccent(document.getElementById('ville').value);
+  const fam = document.getElementById('famille').value;
+  /* Le nom de l'etablissement passe DEVANT : c'est le seul hashtag qui
+     ramene quelqu'un vers lui. Les generiques ne servent qu'a completer,
+     et ce sont eux qu'on coupe quand on atteint le plafond de cinq. */
+  const nom = sansAccent(document.getElementById('nom').value);
+  const t = [];
+  if (nom && nom.length >= 3) t.push(nom);
+  (HASH_FAMILLE[fam] || ['restaurant']).forEach((x) => t.push(x));
+  if (ville) t.push(ville + '974');
+  t.push('reunion974', 'foodreunion');
+  return [...new Set(t)].slice(0, 5);
+};
+const peindreTags = () => {
+  const z = document.getElementById('tags');
+  if (z) z.innerHTML = calculerTags().map((t) => '<b>#' + t + '</b>').join('');
+};
+/* 'nom' compris : le hashtag de l'etablissement doit suivre la saisie,
+   sinon on affiche des tags perimes jusqu'au prochain changement de ville. */
+['nom', 'ville', 'famille'].forEach((id) => {
+  const e = document.getElementById(id);
+  if (e) e.addEventListener('change', peindreTags);
+  if (e) e.addEventListener('input', peindreTags);
+});
+/* Un feed produit pour un lead arrive ici pré-rempli : le générateur n'a qu'à
+   composer l'adresse. Sans ça, il faut retaper le nom et la ville à la main.
+   IMPORTANT : ceci s'exécutait AVANT que l'état E existe. Le champ « famille »
+   déclenche un gestionnaire qui lit E.nom — donc « Cannot read properties of
+   null » à chaque ouverture d'un lien pré-rempli, et l'ambiance de l'URL
+   silencieusement perdue. On applique donc l'adresse une fois l'état construit.
+   Les champs texte écoutent « input », les listes « change » : on émet les deux,
+   sinon le nom de l'URL n'atteint jamais l'état. */
+function appliquerUrl() {
+  const q = new URLSearchParams(location.search);
+  const poser = (id, cle) => {
+    const v = q.get(cle);
+    const e = document.getElementById(id);
+    if (!v || !e) return;
+    e.value = v;
+    e.dispatchEvent(new Event('input', { bubbles: true }));
+    e.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+  poser('famille', 'famille'); poser('ambiance', 'ambiance');
+  poser('nom', 'nom'); poser('type', 'type'); poser('ville', 'ville');
+}
+
+/* Demain, pas aujourd'hui : le rendu et la relecture prennent du temps, et
+   proposer une heure déjà passée est le meilleur moyen de rater le créneau. */
+(() => {
+  const d = new Date(Date.now() + 86400000);
+  const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0')
+    + '-' + String(d.getDate()).padStart(2, '0');
+  const e = document.getElementById('d-date');
+  if (e && !e.value) e.value = iso;
+  const dire = () => {
+    const z = document.getElementById('d-quand');
+    const dd = document.getElementById('d-date').value;
+    const hh = document.getElementById('d-heure').value;
+    if (!z) return;
+    if (!dd || !hh) { z.textContent = ''; return; }
+    const q = new Date(dd + 'T' + hh + ':00');
+    z.textContent = q.toLocaleDateString('fr-FR',
+      { weekday: 'long', day: 'numeric', month: 'long' }) + ' à ' + hh.replace(':', ' h ')
+      + ' — heure de La Réunion.';
+  };
+  ['d-date', 'd-heure'].forEach((id) => {
+    const x = document.getElementById(id);
+    if (x) x.addEventListener('change', () => { dire(); peindreRecap(); });
+  });
+  dire();
+})();
+
+peindreTags();
+
+const dlg = document.getElementById('dlg');
+const dlgConf = document.getElementById('dlg-conf');
+
+/* ── La légende. Elle n'existait pas : on envoyait une composition sans texte,
+      donc rien de publiable. Elle est proposée, puis modifiable — et dès qu'on
+      y touche, elle n'est plus réécrite sous les doigts. ─────────────────── */
+const LEG_FAMILLE = {
+  creole: 'La carte du jour, en cuisine créole.',
+  pizza: 'La carte du jour, sortie du four.',
+  japonais: 'La carte du jour, coupée à la minute.',
+  burger: 'La carte du jour, au grill.',
+  snack: 'La carte du jour, à emporter.',
+};
+let legendeTouchee = false;
+const legendeAuto = () => {
+  const nom = (E.nom || '').trim();
+  const ville = (E.ville || '').trim();
+  return (nom ? nom + '\n' : '')
+    + (LEG_FAMILLE[E.famille] || 'La carte du jour.')
+    + (ville ? '\n' + ville + '.' : '');
+};
+const champLegende = document.getElementById('legende');
+const rafraichirLegende = () => {
+  if (!champLegende || legendeTouchee) return;
+  champLegende.value = legendeAuto();
+};
+if (champLegende) champLegende.addEventListener('input', () => {
+  legendeTouchee = true; modifs++; garder(); peindreRecap();
+});
+
+/* Le texte complet réellement posté : légende + hashtags, dans cet ordre. */
+const legendeComplete = () => {
+  const t = (champLegende ? champLegende.value : legendeAuto()).trim();
+  return t + '\n\n' + calculerTags().map((x) => '#' + x).join(' ');
+};
+
+/* ── Mode automatique. Éteint par défaut, et il le reste tant que personne ne
+      le coche : publier sans relecture n'est pas un défaut raisonnable. ──── */
+const champAuto = document.getElementById('auto');
+const modeAuto = () => !!(champAuto && champAuto.checked);
+const peindreAuto = () => {
+  if (!champAuto) return;
+  const on = champAuto.checked;
+  champAuto.closest('.bascule').classList.toggle('on', on);
+  document.getElementById('auto-etat').textContent = on
+    ? 'Activé.'
+    : 'Réservé aux établissements accompagnés : vos publications partent toutes seules sur VOTRE compte, à heure fixe. Il faut connecter votre compte une fois — demandez-moi comment.';
+  const bouton = document.getElementById('planifier');
+  if (bouton) bouton.textContent = 'Programmer ces publications';
+  peindreRecap();
+};
+if (champAuto) {
+  try {
+    const memo = localStorage.getItem('fb-auto');
+    champAuto.checked = (memo === null) ? true : (memo === '1');
+  } catch (e) { champAuto.checked = true; }
+  champAuto.addEventListener('change', () => {
+    try { localStorage.setItem('fb-auto', champAuto.checked ? '1' : '0'); } catch (e) {}
+    peindreAuto();
+  });
+}
+
+/* ── Le récapitulatif sous le bouton ──────────────────────────────────── */
+function peindreRecap() {
+  const z = document.getElementById('recap-txt');
+  if (!z) return;
+  const v = document.getElementById('recap-vig');
+  if (v && E) v.src = url(E.photos[0]);
+  const quand = (document.getElementById('d-quand') || {}).textContent || 'créneau non choisi';
+  const n = calculerTags().length;
+  const debut = (champLegende ? champLegende.value : '').trim().split('\n')[0] || '(légende vide)';
+  z.innerHTML = 'Part sur <b>Instagram @foodboost</b> · reel 9:16 · <b>' + quand.replace(' — heure de La Réunion.', '') + '</b><br>'
+    + '« ' + debut.slice(0, 46) + (debut.length > 46 ? '…' : '') + ' » · ' + n + ' hashtags · '
+    + (modeAuto() ? '<b>publication automatique</b>' : 'relecture de Tony avant publication');
+}
+
+/* ── L'envoi : on montre d'abord EXACTEMENT ce qui part, on envoie ensuite. */
+function composer() {
+  const sortie = JSON.parse(JSON.stringify(E));
+  const d1 = (document.getElementById('d-date') || {}).value || '';
+  const h1 = (document.getElementById('d-heure') || {}).value || '';
+  sortie.legende = legendeComplete();
+  sortie.destination = { reseau: 'instagram', compte: '@foodboost',
+    format: 'reel 9:16', hashtags: calculerTags(), publie: modeAuto(),
+    creneau: d1 && h1 ? d1 + 'T' + h1 + ':00+04:00' : null };
+  sortie.photos = sortie.photos.map((p) => p.startsWith('data:') ? '(photo téléversée)' : p);
+  /* Le post, c'est UNE tuile — celle qu'on a choisie. La grille sert à voir le
+     compte, pas à être publiée d'un bloc. */
+  sortie.poste = selection === null ? null : PLAN[selection].p;
+  return sortie;
+}
+
+document.getElementById('planifier').addEventListener('click', () => {
+  if (selection === null) {
+    alert('Touchez la vignette que vous voulez publier : c\'est cette publication-là qui part, pas tout le feed.');
+    return;
+  }
+  const s = composer();
+  document.getElementById('conf-mode').textContent = modeAuto()
+    ? 'Mode automatique — réservé aux établissements accompagnés.'
+    : 'Rien ne sera publié. En confirmant, votre composition part chez Tony, qui vous confirme avant toute mise en ligne.';
+  document.getElementById('conf-mode').className = modeAuto() ? 'chaud' : '';
+  document.getElementById('conf-creneau').textContent =
+    (document.getElementById('d-quand') || {}).textContent || 'aucun créneau choisi';
+  document.getElementById('conf-tags').textContent = s.destination.hashtags.map((x) => '#' + x).join(' ');
+  document.getElementById('conf-leg').textContent = s.legende;
+  /* L'aperçu du média : LA tuile choisie, en grand. Montrer la grille entière
+     laissait croire que les neuf partaient — c'est un post qui part. */
+  const media = document.getElementById('conf-media');
+  media.innerHTML = '';
+  if (selection === null) {
+    media.innerHTML = '<div style="padding:18px;text-align:center;opacity:.8">'
+      + 'Choisis d\'abord la vignette à publier dans l\'aperçu.</div>';
+  } else {
+    const src = document.querySelector('#grille .v[data-i="' + selection + '"]');
+    if (src) {
+      const un = src.cloneNode(true);
+      un.classList.remove('actif');
+      un.style.cssText += ';width:min(230px,60%);margin:0 auto;display:block';
+      media.appendChild(un);
+    }
+  }
+  dlgConf.showModal();
+});
+document.getElementById('conf-annuler').addEventListener('click', () => dlgConf.close());
+document.getElementById('conf-ok').addEventListener('click', () => {
+  const sortie = composer();
+  const televersees = E.photos.filter((p) => p.startsWith('data:')).length;
+  /* On signale sans bloquer : la fenêtre s ouvre même si le réseau tombe. */
+  try {
+    /* Deux webhooks, deux roles. `feed-planifier` existait deja et alimente la
+       chaine de rendu ; `demo-planif` est celui qui previent Tony ET renvoie au
+       restaurateur son recapitulatif — c'est lui qui ferme la boucle cote
+       client. On garde les deux plutot que d'en casser un qui tourne. */
+    fetch('https://n7n.automatisationboost.com/webhook/demo-planif', {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' }, keepalive: true,
+      body: JSON.stringify({
+        type: 'planification',
+        slug: new URLSearchParams(location.search).get('client') || '',
+        nom: E.nom, ville: E.ville, tel: '',
+        email: (document.getElementById('email-client') || {}).value || '',
+        jour: new Date(Date.now() + 86400000).toISOString().slice(0, 10),
+        heure: '18:00',
+        photos: (sortie.photos || []).slice(0, 3),
+        quand: new Date().toISOString(),
+      }),
+    }).catch(function () {});
+    fetch('https://n7n.automatisationboost.com/webhook/feed-planifier', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true,
+      body: JSON.stringify({
+        client: new URLSearchParams(location.search).get('client') || '',
+        nom: E.nom, type: E.type, ville: E.ville, famille: E.famille,
+        ambiance: E.ambiance, modifs,
+        legende: sortie.legende, auto: modeAuto(), publier: modeAuto(),
+        photos: sortie.photos, destination: sortie.destination,
+        poste: sortie.poste,
+      }),
+    }).catch(function () {});
+  } catch (e) {}
+  dlgConf.close();
+  document.getElementById('dlg-t').textContent = 'C’est programmé';
+  document.getElementById('dlg-p').textContent =
+    ('Votre composition est transmise. Rien n\'est publié : Tony vous confirme la mise en ligne, et vous validez avant que quoi que ce soit ne parte.')
+    + (televersees ? ' ' + televersees + ' photo(s) que tu as envoyée(s) restent dans ce navigateur : le rendu utilisera la banque à leur place.' : '');
+  document.getElementById('dlg-json').textContent = JSON.stringify(sortie, null, 2);
+  /* La suite : on pre-remplit avec le nom, sinon Tony recoit un message anonyme
+     et ne peut pas relier la demande a la composition qu'il vient de recevoir. */
+  const qui = (E.nom || '').trim() || 'mon restaurant';
+  const ou  = (E.ville || '').trim();
+  const msg = 'Bonjour Tony, je viens de composer un feed pour ' + qui
+            + (ou ? ' (' + ou + ')' : '') + ' avec ton outil FoodBoost. '
+            + 'J\'aimerais qu\'on en parle pour l\'installer chez moi.';
+  document.getElementById('suite-rdv').href =
+    'https://calendly.com/tony-payet-professionnel/nouvelle-reunion';
+  document.getElementById('suite-wa').href =
+    'https://wa.me/262692417749?text=' + encodeURIComponent(msg);
+  dlg.showModal();
+});
+document.getElementById('dlg-copier').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(document.getElementById('dlg-json').textContent);
+    document.getElementById('dlg-copier').textContent = 'Copié'; } catch (e) {}
+});
+document.getElementById('dlg-fermer').addEventListener('click', () => dlg.close());
+
+/* Reprise de la session précédente, si le navigateur l'a gardée. */
+try {
+  const gardee = JSON.parse(localStorage.getItem('fb-editeur') || 'null');
+  E = gardee && gardee.photos ? gardee : neuf('creole');
+} catch (e) { E = neuf('creole'); }
+document.getElementById('nom').value = E.nom;
+document.getElementById('type').value = E.type;
+document.getElementById('ville').value = E.ville;
+document.getElementById('ambiance').value = E.ambiance;
+document.getElementById('famille').value = E.famille;
+/* Sans ?client=, l'éditeur se comporte exactement comme avant. */
+(async () => {
+  const slug = new URLSearchParams(location.search).get('client');
+  let client = null;
+  if (slug) {
+    try {
+      const tous = await (await fetch('clients.json?t=' + Date.now())).json();
+      client = tous[slug] || null;
+    } catch (e) { /* pas de fiche client : on garde la banque seule */ }
+  }
+  banque(PHOTOS_BANQUE, client);
+  /* Les photos du client ne suffisent pas dans la banque : tant qu'elles n'y
+     sont que disponibles, l'aperçu qu'on envoie montre des plats de stock —
+     c'est-à-dire le feed de quelqu'un d'autre. On les POSE donc dans la grille
+     dès l'ouverture, dans l'ordre, et la banque ne complète que ce qui reste.
+     On ne le refait pas si l'état gardé est déjà celui de ce client : sinon un
+     retour sur la page effacerait les vignettes que Tony vient de changer. */
+  if (client && client.photos && client.photos.length && E.client !== slug) {
+    /* Poser les photos du client dans l'apercu, pas seulement dans la banque :
+       sinon l'image qu'on envoie montre des plats de stock, c'est-a-dire le
+       feed de quelqu'un d'autre.
+       Il n'y a que CINQ emplacements, partages entre les stories et la grille.
+       Quand le releve n'a ramene que des vues de salle (cas ArbraDelis, sept
+       photos, zero assiette), les poser toutes collait « Menu du jour : rougail
+       saucisse » sur des tables vides — on ne prend alors que l'emplacement 0,
+       qui porte la photo de profil et deux vignettes sans accroche de plat. */
+    E.client = slug;
+    var plats = client.photos.filter(function(x){ return /plat/.test(x); });
+    var pose = plats.length >= 3 ? client.photos.slice(0, 5) : client.photos.slice(0, 1);
+    pose.forEach(function(n, i){ E.photos[i] = n; });
+    garder();
+    peindre();
+    var z = document.getElementById('banque');
+    if (z && z.parentNode) {
+      var p = document.createElement('p');
+      p.className = 'banque-titre';
+      p.innerHTML = '<b>' + client.photos.length + ' photos de ' + client.nom + '</b> <em>\u00b7 relevees sur '
+        + client.source + '. ' + pose.length + ' posee(s) dans l\u2019apercu, le reste est dans le selecteur.</em>';
+      z.parentNode.insertBefore(p, z);
+    }
+  }
+})();
+appliquerUrl();
+peindre();
+
+/* ── La feuille de réglages, sur téléphone ────────────────────────────────
+   Toucher une vignette ouvrait bien le panneau — deux écrans plus bas, hors
+   du champ de vision. Sur un téléphone ça revenait à ne rien avoir. La feuille
+   monte du bas, la grille reste visible au-dessus, et on voit la vignette
+   changer pendant qu'on tape. Sur écran large, rien ne bouge. */
+const surTelephone = () => window.matchMedia('(max-width:61.99rem)').matches;
+function ouvrirAtelier() {
+  if (!surTelephone()) return;
+  document.body.classList.add('atelier-ouvert');
+  /* La feuille occupe le bas de l'écran : on remonte la vignette choisie dans
+     la bande restée libre, sinon on tape un texte qu'on ne voit pas changer. */
+  requestAnimationFrame(() => {
+    const el = document.querySelector('.v.actif');
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const cible = window.innerHeight * 0.19;
+    const dy = r.top + r.height / 2 - cible;
+    if (Math.abs(dy) > 8) window.scrollBy({ top: dy, behavior: 'smooth' });
+  });
+}
+function fermerAtelier() {
+  document.body.classList.remove('atelier-ouvert');
+}
+document.getElementById('fermer-atelier').addEventListener('click', fermerAtelier);
+
+/* ── Exporter l'aperçu en une image ───────────────────────────────────────
+ * La route /foodboost-editeur/ est derrière le mot de passe nginx : un client
+ * qui reçoit ce lien tombe sur un 401. Ce qui s'envoie, ce n'est donc pas le
+ * lien, c'est une image du feed — en pièce jointe d'un mail, en DM, ou en
+ * WhatsApp.
+ *
+ * On rend le bloc d'aperçu tel qu'il est à l'écran, à 2x pour que ce soit net
+ * sur un téléphone, puis on déclenche un téléchargement. Le nom du fichier
+ * porte celui de l'établissement : cinq démos dans un dossier « Téléchargements »
+ * toutes appelées « feed.png » ne se distinguent plus.
+ */
+document.getElementById('image').addEventListener('click', async (ev) => {
+  const b = ev.currentTarget;
+  const av = b.textContent;
+  if (typeof html2canvas !== 'function') { b.textContent = 'export indisponible'; setTimeout(() => { b.textContent = av; }, 2500); return; }
+  b.disabled = true; b.textContent = 'rendu…';
+  try {
+    /* La feuille de réglages du téléphone recouvre l'aperçu : on la ferme avant
+       de photographier, sinon elle se retrouve dans l'image envoyée au client. */
+    fermerAtelier();
+    const cible = document.getElementById('apercu');
+    const toile = await html2canvas(cible, {
+      backgroundColor: getComputedStyle(document.body).backgroundColor || '#0a0a0f',
+      scale: 2, useCORS: true, logging: false,
+    });
+    const nom = (E.nom || 'feed').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'feed';
+    const a = document.createElement('a');
+    /* JPEG et pas PNG : la même image sortait à 2,2 Mo en PNG, ce qui passe mal
+       en pièce jointe et se fait recompresser par WhatsApp de toute façon. En
+       JPEG 0,92 elle fait quelques centaines de kilo-octets et le feed est fait
+       de photos, pas d'aplats — le PNG n'apportait rien. */
+    a.download = 'feed-' + nom + '.jpg';
+    a.href = toile.toDataURL('image/jpeg', 0.92);
+    document.body.appendChild(a); a.click(); a.remove();
+    b.textContent = 'image enregistrée';
+  } catch (e) {
+    b.textContent = 'export impossible';
+  }
+  setTimeout(() => { b.disabled = false; b.textContent = av; }, 2200);
+});
+document.getElementById('voile-atelier').addEventListener('click', fermerAtelier);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerAtelier(); });
+/* Repasser en grand écran avec la feuille ouverte laissait la page bloquée
+   au défilement : la classe survivait au changement de largeur. */
+window.matchMedia('(max-width:61.99rem)').addEventListener('change', (e) => {
+  if (!e.matches) fermerAtelier();
+});
+
+rafraichirLegende();
+peindreAuto();
+peindreTags();
+peindreRecap();
+</script>
+</body>
+</html>
