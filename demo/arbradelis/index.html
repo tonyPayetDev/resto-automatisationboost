@@ -1,0 +1,80 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>l’ArbraDelis’ — un feed Instagram, en exemple</title>
+<style>
+:root{--bg:#0b0b0d;--carte:#141418;--trait:#26262c;--or:#f0a500;--doux:#9b9ba4;--txt:#f4f4f6}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font:400 16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:30px 16px 70px;display:flex;flex-direction:column;align-items:center}
+.w{width:min(100%,430px)}
+.sur{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--doux);text-align:center}
+h1{font-size:clamp(22px,5.4vw,29px);letter-spacing:-.02em;text-align:center;margin:8px 0 6px}
+.s{color:var(--doux);text-align:center;font-size:14.5px;margin-bottom:10px}
+.chiffre{text-align:center;font-size:14.5px;color:var(--txt);margin-bottom:22px}
+.chiffre b{color:var(--or)}
+.tel{background:var(--carte);border:1px solid var(--trait);border-radius:16px;overflow:hidden}
+.tete{padding:15px 15px 12px;display:flex;gap:12px;align-items:center}
+.pp{width:56px;height:56px;border-radius:50%;background-size:cover;background-position:center;flex:none;border:2px solid var(--or)}
+.tid h2{font-size:17px}.tid p{font-size:13px;color:var(--doux)}
+.sto{display:flex;gap:11px;padding:0 15px 14px;overflow-x:auto}.sto div{text-align:center;flex:none}
+.sto i{display:block;width:52px;height:52px;border-radius:50%;background-size:cover;background-position:center;
+  border:2px solid var(--or);outline:2px solid var(--carte)}
+.sto span{display:block;font-size:10.5px;color:var(--doux);margin-top:4px}
+.gr{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.v{position:relative;aspect-ratio:1;background-size:cover;background-position:center}
+.ombre{position:absolute;inset:0;background:linear-gradient(to top,#000000cc,transparent 62%)}
+.hk{position:absolute;left:8px;right:8px;bottom:8px;font:800 12px/1.2 inherit}.hk em{font-style:normal;color:var(--or)}
+.mn{position:absolute;left:8px;right:8px;bottom:8px;background:#0b0b0dd9;border-radius:6px;padding:7px 8px}
+.mn b{display:block;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--or);margin-bottom:3px}
+.mn span{display:block;font-size:10.5px;color:#dcdce2}
+.note{margin-top:22px;background:var(--carte);border:1px solid var(--trait);border-radius:14px;padding:17px 18px;font-size:14.5px}
+.note b{color:var(--or)}.note p+p{margin-top:9px}
+.cta{display:block;margin-top:16px;background:var(--or);color:#1a1200;text-align:center;font-weight:800;
+  text-decoration:none;border-radius:11px;padding:15px 18px}
+.pied{margin-top:16px;font-size:12.5px;color:var(--doux);text-align:center}.pied a{color:var(--doux)}
+</style>
+<div class="w">
+  <p class="sur">Exemple · rien n’est publié</p>
+  <h1>l’ArbraDelis’</h1>
+  <p class="s">À quoi ressemblerait votre compte Instagram.</p>
+  <p class="chiffre">Vous êtes notés <b>4,4 sur Google</b>. Votre compte, lui, n’en dit rien.</p>
+
+  <div class="tel">
+    <div class="tete">
+      <div class="pp" style="background-image:url('photos/eux1.jpg')"></div>
+      <div class="tid"><h2>l’ArbraDelis’</h2><p>Restaurant créole · Saint-Denis</p></div>
+    </div>
+    <div class="sto">
+      <div><i style="background-image:url('photos/eux1.jpg')"></i><span>Maison</span></div>
+      <div><i style="background-image:url('photos/plat1.jpg')"></i><span>Cuisine</span></div>
+      <div><i style="background-image:url('photos/eux2.jpg')"></i><span>Frais</span></div>
+      <div><i style="background-image:url('photos/plat2.jpg')"></i><span>Partage</span></div>
+      <div><i style="background-image:url('photos/eux3.jpg')"></i><span>Goût</span></div>
+    </div>
+    <div class="gr">
+      <div class="v" style="background-image:url('photos/plat1.jpg')"><div class="ombre"></div><p class="hk">ÇA MIJOTE<br><em>DEPUIS CE MATIN.</em></p></div>
+      <div class="v" style="background-image:url('photos/eux2.jpg')"></div>
+      <div class="v" style="background-image:url('photos/plat2.jpg')"><div class="ombre"></div><div class="mn"><b>Menu du jour</b><span>Rougail saucisse</span><span>Cari poulet</span><span>Riz · grains</span></div></div>
+      <div class="v" style="background-image:url('photos/eux3.jpg')"></div>
+      <div class="v" style="background-image:url('photos/plat3.jpg')"><div class="ombre"></div><p class="hk">LA SAUCE QUI FAIT<br><em>FINIR L'ASSIETTE.</em></p></div>
+      <div class="v" style="background-image:url('photos/eux4.jpg')"></div>
+      <div class="v" style="background-image:url('photos/plat4.jpg')"><div class="ombre"></div><div class="mn"><b>À emporter</b><span>Samoussas</span><span>Bouchons</span><span>Gâteau patate</span></div></div>
+      <div class="v" style="background-image:url('photos/plat5.jpg')"><div class="ombre"></div><p class="hk">TU PENSES CONNAÎTRE<br><em>LE ROUGAIL ?</em></p></div>
+      <div class="v" style="background-image:url('photos/eux5.jpg')"></div>
+    </div>
+  </div>
+
+  <div class="note">
+    <p><b>Les vues de votre salle sont les vôtres</b>, prises sur arbradelis.com.
+    <b>Les assiettes sont des exemples</b> — les vôtres prendront leur place le jour où
+    vous m’envoyez trois photos de vos plats. Rien n’a été acheté sur une banque d’images.</p>
+    <p>Ce qui change par rapport à un compte tenu à la main : les publications sont préparées
+    d’avance, à heure fixe, sans que quelqu’un en cuisine ait à y penser.</p>
+    <p>Cette page n’est visible que par vous. Rien n’a été publié nulle part.</p>
+  </div>
+
+  <a class="cta" href="https://automatisationboost.com/r.html?a=arbradelis&q=audit&s=resto">Trois publications offertes, puis vous décidez</a>
+  <p class="pied">Tony PAYET · AutomatisationBoost · La Réunion —
+    <a href="mailto:tony.payet.professionnel@gmail.com">tony.payet.professionnel@gmail.com</a></p>
+</div>
