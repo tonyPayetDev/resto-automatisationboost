@@ -282,6 +282,28 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
 .cas p{margin:0;font-size:14.5px;color:var(--attenue);line-height:1.65}
 
 /* ── Tarifs ──────────────────────────────────────────────────────────── */
+/* La derniere video : le texte a gauche, le telephone a droite, empiles sur
+   mobile. `preload=none` — la page ne telecharge pas 14 Mo pour un visiteur qui
+   ne cliquera peut-etre jamais ; l'affiche suffit a montrer ce que c'est. */
+.derniere{display:grid;gap:24px;grid-template-columns:1fr;align-items:center;
+  background:var(--surface);border:1px solid var(--filet);border-radius:16px;
+  padding:26px 24px;margin-top:26px}
+@media (min-width:860px){.derniere{grid-template-columns:1fr auto;gap:38px;padding:32px 34px}}
+.derniere h3{margin:6px 0 10px;font-family:var(--display);color:var(--creme);font-size:24px}
+.derniere p{margin:0 0 18px;font-size:15px;color:var(--texte);max-width:46ch}
+.derniere video{display:block;width:min(100%,270px);border-radius:14px;background:#000;
+  box-shadow:0 22px 50px -22px #000;margin:0 auto}
+.note-formulaire{display:none}
+
+/* Le fond de la section demo : des noeuds relies, comme un schema
+   d'orchestration. Dessine au canvas et non en DOM — une centaine de div
+   animees ferait recalculer la mise en page a chaque image, et la cible
+   consulte au telephone. Coupe net si le visiteur a demande moins d'animation,
+   et hors de l'arbre d'accessibilite : ce n'est qu'un decor. */
+.demo{position:relative;overflow:hidden}
+.demo > .enveloppe{position:relative;z-index:1}
+#toile-noeuds{position:absolute;inset:0;width:100%;height:100%;opacity:.5;pointer-events:none}
+@media (prefers-reduced-motion:reduce){#toile-noeuds{display:none}}
 .tarifs{padding:var(--section) 0;background:var(--braise);scroll-margin-top:84px}
 /* Trois formules. Elles se lisent en colonne sur telephone — c'est la que la
    cible consulte — et se posent cote a cote a partir de 900 px. La formule du
@@ -618,6 +640,7 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
 
 <!-- ══ Démo ══ -->
 <section class="demo" id="demo">
+  <canvas id="toile-noeuds" aria-hidden="true"></canvas>
   <div class="enveloppe">
     <div class="chapeau ap">
       <p class="kicker">Démonstration</p>
@@ -653,14 +676,26 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
       </figure>
     </div>
 
-    <div class="cadre-formulaire ap">
-      <iframe src="https://n7n.automatisationboost.com/form/68cf006b-7b57-4fb8-9d29-9dca617a0ce1"
-              title="Formulaire — créez votre visuel Instagram"
-              loading="lazy"></iframe>
+    <!-- Le formulaire n8n etait embarque ici dans un iframe de 860 px : il
+         demandait au visiteur de saisir son menu AVANT d'avoir vu quoi que ce
+         soit, et il poussait le reste de la page hors de l'ecran sur telephone.
+         A sa place, la derniere video reellement produite. -->
+    <div class="derniere ap">
+      <div class="derniere-txt">
+        <p class="kicker">La dernière en date</p>
+        <h3>Une vidéo, faite le 31 août</h3>
+        <p>Trois plats, dix-neuf secondes, aucune caméra. Le montage, la musique et
+          la carte de fin sont produits par la machine — c'est exactement ce qui
+          partirait sur votre compte.</p>
+        <a class="btn btn-plein" href="#test">Recevoir la mienne, gratuitement</a>
+      </div>
+      <div class="derniere-video">
+        <video src="https://assets.automatisationboost.com/resto/foodboost-derniere-video.mp4"
+               poster="assets/fb-derniere-video.jpg" controls playsinline preload="none"
+               width="270" height="480"></video>
+      </div>
     </div>
-    <p class="note-formulaire">Vous restez sur cette page. Le visuel arrive par email.</p>
-  </div>
-</section>
+  </section>
 
 <!-- ══ À propos ══ -->
 <section class="apropos" id="apropos">
@@ -899,6 +934,64 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
   }
   battre();
   var minuteur = setInterval(battre, 1000);
+})();
+</script>
+<script>
+/* Fond anime de la section demo : des noeuds qui derivent et se relient quand
+   ils se rapprochent. C'est le vocabulaire visuel de l'orchestration — des
+   pieces qui se parlent toutes seules — et c'est exactement ce que le service
+   fait pour le restaurateur.
+   Trois precautions qui font la difference entre un decor et une gene :
+   la densite suit la LARGEUR (un telephone n'a pas a calculer 90 noeuds),
+   le rendu s'arrete quand la section sort de l'ecran, et tout est coupe si le
+   visiteur a demande moins d'animation. */
+(function () {
+  var c = document.getElementById('toile-noeuds');
+  if (!c || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var x = c.getContext('2d'), sec = c.parentElement, n = [], vu = true, boucle = null;
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function dimensionner() {
+    var r = sec.getBoundingClientRect();
+    c.width = Math.max(1, r.width * dpr); c.height = Math.max(1, r.height * dpr);
+    var densite = r.width < 600 ? 26 : (r.width < 1000 ? 44 : 64);
+    n = [];
+    for (var i = 0; i < densite; i++) {
+      n.push({ x: Math.random() * c.width, y: Math.random() * c.height,
+               vx: (Math.random() - .5) * .22 * dpr, vy: (Math.random() - .5) * .22 * dpr,
+               r: (1.1 + Math.random() * 1.7) * dpr });
+    }
+  }
+  function dessiner() {
+    x.clearRect(0, 0, c.width, c.height);
+    var lien = (c.width < 900 ? 120 : 150) * dpr;
+    for (var i = 0; i < n.length; i++) {
+      var a = n[i];
+      a.x += a.vx; a.y += a.vy;
+      if (a.x < 0 || a.x > c.width) a.vx *= -1;
+      if (a.y < 0 || a.y > c.height) a.vy *= -1;
+      for (var j = i + 1; j < n.length; j++) {
+        var b = n[j], dx = a.x - b.x, dy = a.y - b.y, d = Math.hypot(dx, dy);
+        if (d > lien) continue;
+        x.strokeStyle = 'rgba(232,163,61,' + (0.20 * (1 - d / lien)).toFixed(3) + ')';
+        x.lineWidth = dpr * .7;
+        x.beginPath(); x.moveTo(a.x, a.y); x.lineTo(b.x, b.y); x.stroke();
+      }
+      x.fillStyle = 'rgba(232,163,61,.42)';
+      x.beginPath(); x.arc(a.x, a.y, a.r, 0, 6.2832); x.fill();
+    }
+    boucle = requestAnimationFrame(dessiner);
+  }
+  function relancer() {
+    if (boucle) cancelAnimationFrame(boucle);
+    boucle = vu ? requestAnimationFrame(dessiner) : null;
+  }
+  dimensionner(); relancer();
+  addEventListener('resize', function () { dimensionner(); }, { passive: true });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (e) { vu = e[0].isIntersecting; relancer(); },
+      { threshold: 0 }).observe(sec);
+  }
 })();
 </script>
 <script>
