@@ -116,9 +116,22 @@ var CAT = {"diana-dea-lodge":{"nom":"Diana Dea Lodge","commune":"Saint-Benoît",
     {p:3}, {p:4, h:['LA SAUCE QUI FAIT',"FINIR L'ASSIETTE."]}, {p:5},
     {p:6}, {p:7, h:['TU AS DÉJÀ','GOÛTÉ ?']}, {p:8}
   ];
+  /* Les accroches parlent d'assiettes : elles doivent tomber sur des assiettes.
+     Posees dans l'ordre du dossier, « la sauce qui fait finir l'assiette »
+     atterrissait sur une photo de terrasse. Les fichiers « plat » passent donc
+     en priorite sur les trois cases legendees (1, 4, 7). */
   var photos = c.photos.slice();
   while (photos.length < 9) photos = photos.concat(c.photos);
   var choix = photos.slice(0, 9);
+  var plats = c.photos.filter(function(x){ return /plat/.test(x); });
+  if (plats.length >= 3) {
+    var autres = c.photos.filter(function(x){ return !/plat/.test(x); });
+    var i = 0, j = 0;
+    choix = [0,1,2,3,4,5,6,7,8].map(function(k){
+      if (k === 1 || k === 4 || k === 7) return plats[(i++) % plats.length];
+      return autres.length ? autres[(j++) % autres.length] : plats[(i++) % plats.length];
+    });
+  }
   var sel = null;
 
   function peindre(){
