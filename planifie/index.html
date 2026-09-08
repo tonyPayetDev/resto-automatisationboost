@@ -1,0 +1,88 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Vos publications sont programmées — Food Boost</title>
+<style>
+:root{--bg:#0b0b0d;--carte:#141418;--trait:#26262c;--or:#f0a500;--doux:#9b9ba4;--txt:#f4f4f6;--vert:#4ade80}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--txt);font:400 16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  padding:30px 16px 80px;display:flex;flex-direction:column;align-items:center}
+.w{width:min(100%,430px)}
+.sur{font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--vert);text-align:center}
+h1{font-size:clamp(22px,5.2vw,28px);letter-spacing:-.02em;text-align:center;margin:8px 0 6px;text-wrap:balance}
+.s{color:var(--doux);text-align:center;font-size:14.5px;margin-bottom:22px}
+.post{background:var(--carte);border:1px solid var(--trait);border-radius:14px;overflow:hidden;margin-bottom:12px;display:flex;gap:0}
+.post .im{width:112px;flex:none;background-size:cover;background-position:center}
+.post .c{padding:13px 14px}
+.post .q{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--or);font-weight:800}
+.post h2{font-size:15.5px;margin:4px 0 3px;letter-spacing:-.01em}
+.post p{font-size:13px;color:var(--doux)}
+.etat{display:inline-block;margin-top:7px;font-size:11.5px;font-weight:700;color:var(--vert);
+  border:1px solid #2a4a35;background:#12261a;border-radius:99px;padding:3px 9px}
+.note{margin-top:20px;background:var(--carte);border:1px solid var(--trait);border-radius:14px;padding:17px 18px;font-size:14.5px}
+.note b{color:var(--or)}.note p+p{margin-top:9px}
+.cta{display:block;margin-top:14px;background:var(--or);color:#1a1200;text-align:center;font-weight:800;
+  text-decoration:none;border-radius:11px;padding:15px 18px}
+.pied{margin-top:16px;font-size:12.5px;color:var(--doux);text-align:center}.pied a{color:var(--doux)}
+.vide{text-align:center;color:var(--doux);padding:40px 0}
+</style>
+<div class="w" id="w">
+  <p class="vide">Chargement…</p>
+</div>
+<script>
+/* La page récapitulative — étape 4 du parcours.
+ *
+ * Tout ce qu'elle affiche est DANS l'adresse, encodé en base64. Pas de base de
+ * données, donc pas de page qui tombe parce qu'un enregistrement a disparu, et
+ * pas de compte à créer pour voir ses propres publications. Un lien qui vit
+ * dans un mail doit fonctionner dans six mois sans rien derrière.
+ *
+ * Ce que la page ne dit PAS : que les publications sont parties. Elles sont
+ * programmées côté Food Boost, et il manque la connexion de leur compte — c'est
+ * exactement ce qui se vend, et le mentir se verrait le lendemain.
+ */
+(function(){
+  var q = new URLSearchParams(location.search);
+  var d = null;
+  try { d = JSON.parse(decodeURIComponent(escape(atob(q.get('d') || '')))); } catch (e) { d = null; }
+  var w = document.getElementById('w');
+  if (!d || !d.nom) {
+    w.innerHTML = '<p class="vide">Ce lien est incomplet. Écrivez-moi à ' +
+      '<a href="mailto:tony.payet.professionnel@gmail.com" style="color:#f0a500">tony.payet.professionnel@gmail.com</a> et je vous le renvoie.</p>';
+    return;
+  }
+  var esc = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+  var JOURS = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+  var MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  var base = new Date((d.jour || '') + 'T12:00:00');
+  if (isNaN(base)) base = new Date();
+  var titres = ['Ça mijote depuis ce matin.', 'La sauce qui fait finir l’assiette.', 'Tu as déjà goûté ?'];
+  var photos = d.photos || [];
+  var html = '<p class="sur">✓ Programmé</p><h1>Vos trois publications sont prêtes</h1>'
+    + '<p class="s">' + esc(d.nom) + ' — elles partiront à ' + esc(d.heure || '18:00') + ', une par jour.</p>';
+  for (var i = 0; i < 3; i++) {
+    var j = new Date(base.getTime() + i * 86400000);
+    var quand = JOURS[j.getDay()] + ' ' + j.getDate() + ' ' + MOIS[j.getMonth()];
+    var im = photos[i] ? esc(photos[i]).replace(/^\.\.\//, '../') : '';
+    html += '<div class="post">'
+      + (im ? '<div class="im" style="background-image:url(\'' + im + '\')"></div>' : '')
+      + '<div class="c"><div class="q">Publication ' + (i + 1) + '</div>'
+      + '<h2>' + titres[i] + '</h2>'
+      + '<p>' + quand + ' vers ' + esc(d.heure || '18:00') + '</p>'
+      + '<span class="etat">En attente de votre compte</span></div></div>';
+  }
+  html += '<div class="note">'
+    + '<p><b>Il ne reste qu’une chose :</b> connecter votre compte Instagram. Une fois, cinq minutes, '
+    + 'et ces trois publications partent toutes seules aux dates ci-dessus.</p>'
+    + '<p>Tant que ce n’est pas fait, rien ne part — je ne peux pas publier chez vous sans votre accord, '
+    + 'et c’est très bien ainsi.</p>'
+    + '<p>Vous avez aussi vos trois visuels en téléchargement dans l’éditeur : si vous préférez les publier '
+    + 'vous-même, ils sont à vous, sans contrepartie.</p></div>'
+    + '<a class="cta" href="https://automatisationboost.com/r.html?a=' + esc(d.slug || '') + '&q=audit&s=resto">Connecter mon compte — on en parle en 10 minutes</a>'
+    + '<p class="pied">Tony PAYET · AutomatisationBoost · La Réunion — '
+    + '<a href="mailto:tony.payet.professionnel@gmail.com">tony.payet.professionnel@gmail.com</a> · '
+    + '<a href="tel:+262692417749">06 92 41 77 49</a></p>';
+  w.innerHTML = html;
+})();
+</script>
