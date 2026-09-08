@@ -137,9 +137,75 @@
    "../demo/kazkfe/photos/p09.jpg"
   ]
  },
+ "mediterraneo": {
+  "nom": "Mediterraneo",
+  "source": "mediterraneo.re",
+  "photos": [
+   "../demo/mediterraneo/photos/p01.jpg",
+   "../demo/mediterraneo/photos/p02.jpg",
+   "../demo/mediterraneo/photos/p03.jpg",
+   "../demo/mediterraneo/photos/p04.jpg"
+  ]
+ },
+ "relais-de-l-hermitage": {
+  "nom": "Relais de l'Hermitage",
+  "source": "www.relais-hermitage-saintgilles.fr",
+  "photos": [
+   "../demo/relais-de-l-hermitage/photos/p01.jpg",
+   "../demo/relais-de-l-hermitage/photos/p02.jpg",
+   "../demo/relais-de-l-hermitage/photos/p03.jpg",
+   "../demo/relais-de-l-hermitage/photos/p04.jpg",
+   "../demo/relais-de-l-hermitage/photos/p05.jpg",
+   "../demo/relais-de-l-hermitage/photos/p06.jpg",
+   "../demo/relais-de-l-hermitage/photos/p07.jpg",
+   "../demo/relais-de-l-hermitage/photos/p08.jpg"
+  ]
+ },
+ "fogo": {
+  "nom": "Fogo",
+  "source": "fogo-restaurant.com",
+  "photos": [
+   "../demo/fogo/photos/p01.jpg",
+   "../demo/fogo/photos/p02.jpg",
+   "../demo/fogo/photos/p03.jpg",
+   "../demo/fogo/photos/p04.jpg",
+   "../demo/fogo/photos/p05.jpg",
+   "../demo/fogo/photos/p06.jpg",
+   "../demo/fogo/photos/p07.jpg",
+   "../demo/fogo/photos/p08.jpg",
+   "../demo/fogo/photos/p09.jpg"
+  ]
+ },
+ "restaurant-le-grand-natte": {
+  "nom": "Restaurant Le Grand Natte",
+  "source": "woodhotel.re",
+  "photos": [
+   "../demo/restaurant-le-grand-natte/photos/p01.jpg",
+   "../demo/restaurant-le-grand-natte/photos/p02.jpg",
+   "../demo/restaurant-le-grand-natte/photos/p03.jpg",
+   "../demo/restaurant-le-grand-natte/photos/p04.jpg",
+   "../demo/restaurant-le-grand-natte/photos/p05.jpg",
+   "../demo/restaurant-le-grand-natte/photos/p06.jpg",
+   "../demo/restaurant-le-grand-natte/photos/p07.jpg",
+   "../demo/restaurant-le-grand-natte/photos/p08.jpg",
+   "../demo/restaurant-le-grand-natte/photos/p09.jpg"
+  ]
+ },
+ "delices-thai": {
+  "nom": "Délices Thaï",
+  "source": "lesdelicesthai.re",
+  "photos": [
+   "../demo/delices-thai/photos/p01.jpg",
+   "../demo/delices-thai/photos/p02.jpg",
+   "../demo/delices-thai/photos/p03.jpg",
+   "../demo/delices-thai/photos/p04.jpg",
+   "../demo/delices-thai/photos/p05.jpg",
+   "../demo/delices-thai/photos/p06.jpg"
+  ]
+ },
  "arbradelis": {
   "nom": "l’ArbraDelis’",
-  "source": "leur site",
+  "source": "arbradelis.com",
   "photos": [
    "../demo/arbradelis/photos/eux1.jpg",
    "../demo/arbradelis/photos/eux2.jpg",
