@@ -283,6 +283,42 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
 
 /* ── Tarifs ──────────────────────────────────────────────────────────── */
 .tarifs{padding:var(--section) 0;background:var(--braise);scroll-margin-top:84px}
+/* Trois formules. Elles se lisent en colonne sur telephone — c'est la que la
+   cible consulte — et se posent cote a cote a partir de 900 px. La formule du
+   milieu est mise en avant par un filet plus vif, pas par une taille
+   differente : agrandir une carte casse l'alignement des lignes et rend la
+   comparaison plus difficile, qui est pourtant le seul travail du lecteur. */
+.formules{display:grid;gap:18px;grid-template-columns:1fr;margin-top:8px}
+@media (min-width:900px){.formules{grid-template-columns:repeat(3,1fr);align-items:stretch}}
+.formule{background:var(--surface);border:1px solid var(--filet);border-radius:14px;
+  padding:26px 24px 24px;display:flex;flex-direction:column;position:relative}
+.formule.mise-en-avant{border-color:var(--filet-fort);background:var(--surface-haute)}
+.formule .etiquette{position:absolute;top:-11px;left:24px;background:var(--ambre);color:#1a1200;
+  font-size:10.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  padding:4px 10px;border-radius:99px}
+.formule h3{margin:0;font-family:var(--display);color:var(--creme);font-size:22px;letter-spacing:.01em}
+.formule .prix{display:flex;align-items:baseline;gap:7px;margin:14px 0 4px}
+.formule .prix b{font-family:var(--display);color:var(--creme);font-size:38px;line-height:1;font-weight:400}
+.formule .prix span{font-size:13.5px;color:var(--attenue)}
+.formule .cadence{font-size:13.5px;color:var(--or);margin-bottom:16px}
+.formule ul{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:9px}
+.formule li{font-size:14px;color:var(--texte);padding-left:20px;position:relative;line-height:1.5}
+.formule li::before{content:"";position:absolute;left:0;top:8px;width:9px;height:9px;
+  border-radius:50%;border:1.5px solid var(--or)}
+.formule li.absent{color:var(--attenue)}
+.formule li.absent::before{border-color:var(--attenue);border-style:dotted}
+.formule .btn{margin-top:auto}
+.socle{margin-top:20px;background:var(--surface);border:1px solid var(--filet);
+  border-radius:14px;padding:22px 24px}
+.socle h3{margin:0 0 4px;font-family:var(--display);color:var(--creme);font-size:19px}
+.socle p{margin:0 0 14px;font-size:14px;color:var(--attenue)}
+.options{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+@media (min-width:760px){.options{grid-template-columns:1fr 1fr}}
+.options li{display:flex;justify-content:space-between;gap:14px;font-size:14px;color:var(--texte);
+  border-bottom:1px solid var(--filet);padding-bottom:9px}
+.options li b{color:var(--creme);font-weight:600;white-space:nowrap}
+.note-prix{margin-top:16px;font-size:13px;color:var(--attenue);text-align:center;max-width:62ch;
+  margin-left:auto;margin-right:auto}
 .offre{background:var(--surface);border:1px solid var(--filet-fort);
   padding:clamp(28px,4.4vw,52px);position:relative;
   box-shadow:0 40px 90px -60px #000}
@@ -672,35 +708,75 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
   <div class="enveloppe">
     <div class="chapeau ap">
       <p class="kicker">Tarifs</p>
-      <h2 class="titre-section">Une seule offre</h2>
-      <p class="sous-section">Vous payez l'installation une fois, puis le service au mois.</p>
+      <h2 class="titre-section">Trois formules, selon ce que vous publiez</h2>
+      <p class="sous-section">Vous payez l'installation une fois, puis le service au mois.
+        Sans engagement : on arrête quand vous voulez, vos comptes restent les vôtres.</p>
     </div>
 
-    <div class="offre ap">
-      <div class="montants">
-        <div class="montant">
-          <span class="valeur">[MONTANT]€</span>
-          <span class="quoi">Installation</span>
-          <span class="detail">Une seule fois, au démarrage</span>
-        </div>
-        <div class="separateur-montant" aria-hidden="true"></div>
-        <div class="montant">
-          <span class="valeur">[MONTANT]€</span>
-          <span class="quoi">Par mois</span>
-          <span class="detail">Tant que vous le souhaitez</span>
-        </div>
+    <div class="formules">
+
+      <div class="formule ap">
+        <h3>Régulier</h3>
+        <div class="prix"><b>149&nbsp;€</b><span>par mois</span></div>
+        <p class="cadence">12 publications par mois — trois par semaine</p>
+        <ul>
+          <li>Vos visuels créés à partir de vos plats</li>
+          <li><b>1 réseau</b> — Instagram <em>ou</em> Facebook</li>
+          <li>Validation avant chaque publication</li>
+          <li>Publication programmée à l'heure que vous choisissez</li>
+          <li class="absent">Pas de vidéo</li>
+        </ul>
+        <a class="btn" href="#test">Commencer par le test gratuit</a>
       </div>
 
-      <ul class="inclus">
-        <li>Vos visuels Instagram générés à partir de vos plats</li>
-        <li>Validation par email avant chaque publication</li>
-        <li>Publication programmée à la date et à l'heure de votre choix</li>
-        <li>Vos couleurs et votre identité respectées sur chaque visuel</li>
-      </ul>
+      <div class="formule mise-en-avant ap">
+        <span class="etiquette">Le plus choisi</span>
+        <h3>Complet</h3>
+        <div class="prix"><b>249&nbsp;€</b><span>par mois</span></div>
+        <p class="cadence">20 publications par mois — cinq par semaine</p>
+        <ul>
+          <li>Tout ce qu'il y a dans Régulier</li>
+          <li><b>2 vidéos par mois</b>, format reel, générées à partir de vos plats</li>
+          <li><b>3 réseaux</b> — Instagram, Facebook et TikTok, publiés en même temps</li>
+          <li>Réponse automatique aux commentaires qui demandent la carte</li>
+          <li>Un point par mois sur ce qui a marché</li>
+        </ul>
+        <a class="btn btn-plein" href="#test">Commencer par le test gratuit</a>
+      </div>
 
-      <a class="btn btn-plein" href="#test">Recevoir un visuel test gratuit</a>
-      <p class="sans-engagement">Sans engagement, résiliable à tout moment.</p>
+      <div class="formule ap">
+        <h3>Intensif</h3>
+        <div class="prix"><b>399&nbsp;€</b><span>par mois</span></div>
+        <p class="cadence">30 publications par mois — une par jour</p>
+        <ul>
+          <li>Tout ce qu'il y a dans Complet</li>
+          <li><b>8 vidéos par mois</b> — deux par semaine</li>
+          <li><b>5 réseaux</b> — + YouTube et votre fiche Google</li>
+          <li>Stories programmées en plus des publications</li>
+          <li>Vos plats du jour repris automatiquement de votre carte</li>
+        </ul>
+        <a class="btn" href="#test">Commencer par le test gratuit</a>
+      </div>
+
     </div>
+
+    <div class="socle ap">
+      <h3>Installation : 190&nbsp;€, une seule fois</h3>
+      <p>Connexion de vos comptes, vos couleurs, relevé de vos plats et de votre carte.
+        C'est fait une fois, au démarrage, et ça ne revient pas.</p>
+      <ul class="options">
+        <li><span>Vidéo supplémentaire</span> <b>25 € l'unité</b></li>
+        <li><span>Réseau supplémentaire</span> <b>39 € / mois</b></li>
+        <li><span>Retouche de vos photos de plats existantes</span> <b>sur crédits</b></li>
+        <li><span>Séance photo sur place, à Saint-Denis ou au sud</span> <b>sur devis</b></li>
+        <li><span>Campagne pour une ouverture ou un événement</span> <b>sur devis</b></li>
+        <li><span>Carte et menu du jour repris de votre site</span> <b>inclus dès Complet</b></li>
+      </ul>
+    </div>
+
+    <p class="note-prix">Vous commencez toujours par trois publications offertes, faites avec vos
+      photos. Vous les validez, vous jugez sur pièce, et vous décidez ensuite. Sans engagement,
+      résiliable à tout moment.</p>
   </div>
 </section>
 
