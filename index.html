@@ -288,6 +288,25 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
    milieu est mise en avant par un filet plus vif, pas par une taille
    differente : agrandir une carte casse l'alignement des lignes et rend la
    comparaison plus difficile, qui est pourtant le seul travail du lecteur. */
+/* Le bandeau de lancement. Le compte a rebours vise une DATE FIXE, la meme
+   pour tout le monde : un minuteur qui repart a chaque visite se repere en une
+   seconde (il suffit de recharger) et fait perdre la confiance qu'on venait
+   chercher. Quand la date est passee, le bandeau le dit au lieu de boucler. */
+.lancement{background:linear-gradient(135deg,rgba(232,163,61,.14),rgba(194,65,12,.10));
+  border:1px solid var(--filet-fort);border-radius:14px;padding:22px 24px;margin-bottom:20px;
+  display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+.lancement .txt{flex:1 1 300px}
+.lancement .titre{font-family:var(--display);color:var(--creme);font-size:21px;margin:0 0 5px}
+.lancement .titre .barre{color:var(--attenue);text-decoration:line-through;font-size:17px;margin-right:6px}
+.lancement p{margin:0;font-size:14px;color:var(--texte);max-width:52ch}
+.chrono{display:flex;gap:8px;flex:0 0 auto}
+.chrono div{background:rgba(11,11,11,.55);border:1px solid var(--filet);border-radius:10px;
+  padding:9px 12px;text-align:center;min-width:60px}
+.chrono b{display:block;font-family:var(--display);color:var(--creme);font-size:26px;line-height:1;
+  font-variant-numeric:tabular-nums}
+.chrono span{display:block;margin-top:4px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--attenue)}
+.lancement.fini .chrono{display:none}
 .formules{display:grid;gap:18px;grid-template-columns:1fr;margin-top:8px}
 @media (min-width:900px){.formules{grid-template-columns:repeat(3,1fr);align-items:stretch}}
 .formule{background:var(--surface);border:1px solid var(--filet);border-radius:14px;
@@ -713,6 +732,20 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
         Sans engagement : on arrête quand vous voulez, vos comptes restent les vôtres.</p>
     </div>
 
+    <div class="lancement ap" id="lancement">
+      <div class="txt">
+        <p class="titre"><span class="barre">190&nbsp;€</span>Installation offerte</p>
+        <p id="lancement-txt">Pour tout démarrage avant le dimanche 21 septembre. Vous ne payez
+          que le mois, et vous arrêtez quand vous voulez.</p>
+      </div>
+      <div class="chrono" id="chrono" aria-label="Temps restant">
+        <div><b id="c-j">–</b><span>jours</span></div>
+        <div><b id="c-h">–</b><span>heures</span></div>
+        <div><b id="c-m">–</b><span>min</span></div>
+        <div><b id="c-s">–</b><span>sec</span></div>
+      </div>
+    </div>
+
     <div class="formules">
 
       <div class="formule ap">
@@ -733,7 +766,7 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
         <span class="etiquette">Le plus choisi</span>
         <h3>Complet</h3>
         <div class="prix"><b>249&nbsp;€</b><span>par mois</span></div>
-        <p class="cadence">20 publications par mois — cinq par semaine</p>
+        <p class="cadence">24 publications par mois — six par semaine</p>
         <ul>
           <li>Tout ce qu'il y a dans Régulier</li>
           <li><b>2 vidéos par mois</b>, format reel, générées à partir de vos plats</li>
@@ -761,7 +794,7 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
     </div>
 
     <div class="socle ap">
-      <h3>Installation : 190&nbsp;€, une seule fois</h3>
+      <h3>Installation : <span style="color:var(--attenue);text-decoration:line-through">190&nbsp;€</span> offerte jusqu'au 21 septembre</h3>
       <p>Connexion de vos comptes, vos couleurs, relevé de vos plats et de votre carte.
         C'est fait une fois, au démarrage, et ça ne revient pas.</p>
       <ul class="options">
@@ -829,6 +862,41 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
   </div>
 </footer>
 
+<script>
+/* Compte a rebours de l'offre de lancement.
+   Date FIXE, en heure de La Reunion (UTC+4) : elle est la meme pour tout le
+   monde et ne repart pas a la visite suivante. Un minuteur qui se remet a zero
+   quand on recharge la page se repere en une seconde, et il coute exactement ce
+   qu'on essayait de gagner. Quand la date est passee, on retire le chrono et on
+   le dit — plutot que de boucler sur une urgence qui n'existe plus. */
+(function () {
+  var FIN = new Date('2026-09-21T23:59:59+04:00').getTime();
+  var b = document.getElementById('lancement');
+  if (!b) return;
+  var j = document.getElementById('c-j'), h = document.getElementById('c-h'),
+      m = document.getElementById('c-m'), sec = document.getElementById('c-s');
+  var deux = function (n) { return n < 10 ? '0' + n : String(n); };
+  function battre() {
+    var d = FIN - Date.now();
+    if (d <= 0) {
+      b.classList.add('fini');
+      document.getElementById('lancement-txt').textContent =
+        "L'offre de lancement est terminée. L'installation revient à 190 €, et les trois "
+        + "publications d'essai restent offertes.";
+      var t = b.querySelector('.titre');
+      if (t) t.textContent = 'Offre de lancement terminée';
+      clearInterval(minuteur);
+      return;
+    }
+    j.textContent = Math.floor(d / 86400000);
+    h.textContent = deux(Math.floor(d / 3600000) % 24);
+    m.textContent = deux(Math.floor(d / 60000) % 60);
+    sec.textContent = deux(Math.floor(d / 1000) % 60);
+  }
+  battre();
+  var minuteur = setInterval(battre, 1000);
+})();
+</script>
 <script>
 /* Un seul passage de rendu pour toute la page.
    Un écouteur de défilement par élément ferait recalculer la mise en page une
