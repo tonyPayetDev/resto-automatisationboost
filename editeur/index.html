@@ -24,8 +24,10 @@ h1{font-size:clamp(21px,5.2vw,27px);letter-spacing:-.02em;text-align:center;marg
 .gr{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
 .v{position:relative;aspect-ratio:1;background-size:cover;background-position:center;cursor:pointer}
 .v.actif{outline:3px solid var(--or);outline-offset:-3px;z-index:2}
-.ombre{position:absolute;inset:0;background:linear-gradient(to top,#000000cc,transparent 62%)}
-.hk{position:absolute;left:7px;right:7px;bottom:7px;font:800 11.5px/1.2 inherit}
+/* Le degrade doit tenir sur une photo CLAIRE : sur un sandwich ou une pate a
+   pizza, un voile a 62 % laissait le texte blanc illisible. */
+.ombre{position:absolute;inset:0;background:linear-gradient(to top,#000000e8 0%,#0000009e 38%,transparent 72%)}
+.hk{position:absolute;left:7px;right:7px;bottom:7px;font:800 11.5px/1.2 inherit;text-shadow:0 2px 6px rgba(0,0,0,.92)}
 .hk em{font-style:normal;color:var(--or)}
 .aide{font-size:12.5px;color:var(--doux);text-align:center;margin-top:9px}
 .banque{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:11px}
