@@ -358,6 +358,18 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
 .options li{display:flex;justify-content:space-between;gap:14px;font-size:14px;color:var(--texte);
   border-bottom:1px solid var(--filet);padding-bottom:9px}
 .options li b{color:var(--creme);font-weight:600;white-space:nowrap}
+/* Le tableau comparatif. Il defile horizontalement dans son propre cadre : la
+   page, elle, ne doit jamais partir de travers sur un telephone. */
+.comparo{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:14px}
+.comparo table{width:100%;min-width:520px;border-collapse:collapse;font-size:14px}
+.comparo th{text-align:left;font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--or);font-weight:700;padding:0 12px 9px 0;border-bottom:1px solid var(--filet-fort)}
+.comparo td{padding:11px 12px 11px 0;border-bottom:1px solid var(--filet);color:var(--texte);
+  vertical-align:top;font-variant-numeric:tabular-nums}
+.comparo td span{display:block;font-size:12px;color:var(--attenue);margin-top:2px}
+.comparo tr.vous td{background:rgba(232,163,61,.09);color:var(--creme)}
+.comparo tr.vous td:first-child{border-left:3px solid var(--ambre);padding-left:11px}
+.comparo tr.soi td{color:var(--attenue)}
 .note-prix{margin-top:16px;font-size:13px;color:var(--attenue);text-align:center;max-width:62ch;
   margin-left:auto;margin-right:auto}
 .offre{background:var(--surface);border:1px solid var(--filet-fort);
@@ -844,6 +856,30 @@ h1,h2,h3{font-family:var(--display);color:var(--creme);font-weight:400;
         <li><span>Campagne pour une ouverture ou un événement</span> <b>sur devis</b></li>
         <li><span>Carte et menu du jour repris de votre site</span> <b>inclus dès Complet</b></li>
       </ul>
+    </div>
+
+    <div class="socle ap" style="margin-top:20px">
+      <h3>Ce que ça coûte ailleurs, pour le même travail</h3>
+      <p>Tarifs relevés le 8 septembre 2026 sur les pages publiques de chaque prestataire.
+        Le prix par publication est calculé à partir de ce qu'ils annoncent eux-mêmes.</p>
+      <div class="comparo">
+        <table>
+          <thead><tr><th>Qui</th><th>Par mois</th><th>Publications</th><th>Par publication</th></tr></thead>
+          <tbody>
+            <tr><td>Community Manager Réunion <span>formule Standard</span></td><td>129 €</td><td>1 sur Facebook</td><td>30 €<span>leur chiffre affiché</span></td></tr>
+            <tr><td>Digidatale <span>Réunion</span></td><td>300 €</td><td>8 sur 2 réseaux</td><td>37,50 €</td></tr>
+            <tr><td>CreaWeb La Réunion <span>formule Standard</span></td><td>390 € TTC</td><td>10 environ</td><td>39 €</td></tr>
+            <tr><td>Digiqo <span>formule Essentiel</span></td><td>662 € HT</td><td>5 posts, 5 stories, 1 reel</td><td>60 €</td></tr>
+            <tr><td>Click&amp;Digital <span>spécialiste restaurant, métropole</span></td><td>349 à 789 € HT</td><td>non détaillé</td><td>—</td></tr>
+            <tr><td>Un freelance de l'île <span>50 € de l'heure</span></td><td>≈ 400 €</td><td>8 h de travail</td><td>50 €</td></tr>
+            <tr class="vous"><td><b>Food Boost</b> <span>formule Complet</span></td><td><b>249 €</b></td><td><b>24 + 2 vidéos</b></td><td><b>10,40 €</b></td></tr>
+            <tr class="soi"><td>Vous-même <span>Metricool + Canva Pro</span></td><td>25 €</td><td>autant que vous voulez</td><td>≈ 20 min de votre temps<span>soit 8 h par mois pour 24</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin:14px 0 0;font-size:13.5px;color:var(--attenue)">
+        Les outils à 25 € ne font pas le travail : ils le rangent. Il reste à photographier,
+        détourer, écrire, choisir l'heure et publier — c'est ces huit heures-là qu'on vous rend.</p>
     </div>
 
     <p class="note-prix">Vous commencez toujours par trois publications offertes, faites avec vos
