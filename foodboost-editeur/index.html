@@ -356,12 +356,22 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
         <textarea id="legende" rows="4" maxlength="900"></textarea></label>
       <p class="aide" style="margin:6px 0 0">Les hashtags sont ajoutés à la fin —
         cinq au maximum, sinon Instagram refuse le post.</p>
-      <label class="bascule">
-        <input type="checkbox" id="auto" disabled>
-        <span><b>Publication directe</b> — le post part sur @foodboost dès que tu confirmes.
-          Décoche si tu préfères que Tony relise avant.
-          <em id="auto-etat">Activé.</em></span>
+      <!-- La case restait cochable et le texte parlait encore de @foodboost et
+           tutoyait : c'est celui de l'atelier de Tony. Chez un restaurateur, la
+           publication directe n'est pas une option a cocher, c'est ce qui se
+           vend — et elle suppose que SON compte soit connecte. La case est donc
+           inerte et le bloc explique ce qu'il faut faire pour l'ouvrir. -->
+      <label class="bascule" aria-disabled="true"
+             style="cursor:default;opacity:.85;pointer-events:none">
+        <input type="checkbox" id="auto" disabled tabindex="-1" aria-hidden="true">
+        <span><b>Publication automatique</b> — vos publications partent toutes seules sur
+          <b>votre</b> compte, à heure fixe, sans que personne en cuisine ait à y penser.
+          <em id="auto-etat">Réservé aux établissements accompagnés : il faut connecter votre compte une fois.</em></span>
       </label>
+      <a class="btn" id="demander-auto" href="#"
+         style="display:block;margin-top:10px;text-align:center;text-decoration:none">
+        Comment activer la publication automatique</a>
+      <p class="aide" id="auto-retour" style="margin:8px 0 0"></p>
     </div>
   </section>
   
@@ -828,6 +838,31 @@ function composer() {
   sortie.poste = selection === null ? null : PLAN[selection].p;
   return sortie;
 }
+
+/* Demander la publication automatique : on previent Tony, on ne promet rien
+   d'automatique. Le restaurateur doit connecter son compte, et ca se fait avec
+   lui — c'est le moment de la conversation, pas d'un bouton. */
+var boutonAuto = document.getElementById('demander-auto');
+if (boutonAuto) boutonAuto.addEventListener('click', function (ev) {
+  ev.preventDefault();
+  var r = document.getElementById('auto-retour');
+  boutonAuto.style.pointerEvents = 'none';
+  fetch('https://n7n.automatisationboost.com/webhook/demo-planif', {
+    method: 'POST', headers: { 'Content-Type': 'text/plain' }, keepalive: true,
+    body: JSON.stringify({
+      type: 'mode-auto',
+      slug: new URLSearchParams(location.search).get('client') || '',
+      nom: (E && E.nom) || '', ville: (E && E.ville) || '',
+      email: (document.getElementById('email-client') || {}).value || '',
+      quand: new Date().toISOString(),
+    }),
+  }).then(function () {
+    r.textContent = 'Demande transmise. Tony vous rappelle pour expliquer comment on connecte '
+      + 'votre compte, et ce que ça coûte.';
+  }).catch(function () {
+    r.textContent = 'Appelez-moi directement au 06 92 41 77 49.';
+  }).then(function () { boutonAuto.style.pointerEvents = ''; });
+});
 
 document.getElementById('planifier').addEventListener('click', () => {
   if (selection === null) {
