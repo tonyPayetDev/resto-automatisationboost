@@ -361,12 +361,15 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
            publication directe n'est pas une option a cocher, c'est ce qui se
            vend — et elle suppose que SON compte soit connecte. La case est donc
            inerte et le bloc explique ce qu'il faut faire pour l'ouvrir. -->
-      <label class="bascule" aria-disabled="true"
-             style="cursor:default;opacity:.85;pointer-events:none">
-        <input type="checkbox" id="auto" disabled tabindex="-1" aria-hidden="true">
-        <span><b>Publication automatique</b> — vos publications partent toutes seules sur
-          <b>votre</b> compte, à heure fixe, sans que personne en cuisine ait à y penser.
-          <em id="auto-etat">Réservé aux établissements accompagnés : il faut connecter votre compte une fois.</em></span>
+      <!-- Cochee par defaut : c'est le comportement attendu — on compose, on
+           programme. Elle ne veut PAS dire « publier » : rien ne peut partir sur
+           le compte du restaurateur tant qu'il ne l'a pas connecte, et elle ne
+           doit surtout pas publier sur @foodboost, qui est le compte de Tony. -->
+      <label class="bascule">
+        <input type="checkbox" id="auto" checked>
+        <span><b>Programmer cette publication</b> — elle est réservée à la date et à l'heure
+          choisies plus haut.
+          <em id="auto-etat">Rien ne part tant que votre compte n'est pas connecté : vous validez avant.</em></span>
       </label>
       <a class="btn" id="demander-auto" href="#"
          style="display:block;margin-top:10px;text-align:center;text-decoration:none">
@@ -792,8 +795,8 @@ const peindreAuto = () => {
   const on = champAuto.checked;
   champAuto.closest('.bascule').classList.toggle('on', on);
   document.getElementById('auto-etat').textContent = on
-    ? 'Activé.'
-    : 'Réservé aux établissements accompagnés : vos publications partent toutes seules sur VOTRE compte, à heure fixe. Il faut connecter votre compte une fois — demandez-moi comment.';
+    ? 'Rien ne part tant que votre compte n\'est pas connecté : vous validez avant.'
+    : 'Décochée : votre composition est simplement transmise, sans date.';
   const bouton = document.getElementById('planifier');
   if (bouton) bouton.textContent = 'Programmer ces publications';
   peindreRecap();
@@ -801,7 +804,7 @@ const peindreAuto = () => {
 if (champAuto) {
   try {
     localStorage.removeItem('fb-auto');
-    champAuto.checked = false;          // la porte est fermee tant qu'il n'est pas client
+    champAuto.checked = true;           // on compose pour programmer : c'est le defaut attendu
   } catch (e) { champAuto.checked = false; }
   champAuto.addEventListener('change', () => {
     try { localStorage.setItem('fb-auto', champAuto.checked ? '1' : '0'); } catch (e) {}
@@ -871,8 +874,8 @@ document.getElementById('planifier').addEventListener('click', () => {
   }
   const s = composer();
   document.getElementById('conf-mode').textContent = modeAuto()
-    ? 'Mode automatique — réservé aux établissements accompagnés.'
-    : 'Rien ne sera publié. En confirmant, votre composition part chez Tony, qui vous confirme avant toute mise en ligne.';
+    ? 'En confirmant, cette publication est programmée à la date choisie. Rien ne part tant que votre compte n\'est pas connecté.'
+    : 'En confirmant, votre composition est transmise, sans date.';
   document.getElementById('conf-mode').className = modeAuto() ? 'chaud' : '';
   document.getElementById('conf-creneau').textContent =
     (document.getElementById('d-quand') || {}).textContent || 'aucun créneau choisi';
@@ -925,7 +928,11 @@ document.getElementById('conf-ok').addEventListener('click', () => {
         client: new URLSearchParams(location.search).get('client') || '',
         nom: E.nom, type: E.type, ville: E.ville, famille: E.famille,
         ambiance: E.ambiance, modifs,
-        legende: sortie.legende, auto: modeAuto(), publier: modeAuto(),
+        /* `publier` reste FAUX quoi qu'il arrive. La case du restaurateur veut
+           dire « programme-la », pas « publie-la » : la publication demande son
+           compte connecte, et surtout elle ne doit jamais partir sur @foodboost,
+           qui est le compte de Tony. */
+        legende: sortie.legende, auto: false, publier: false, programmer: modeAuto(),
         photos: sortie.photos, destination: sortie.destination,
         poste: sortie.poste,
       }),
