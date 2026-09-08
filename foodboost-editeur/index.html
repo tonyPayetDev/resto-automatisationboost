@@ -478,7 +478,11 @@ const PLAN = [
    resto.automatisationboost.com, ou les demos les servent. Les dupliquer
    dans ce depot ajoutait 32 Mo pour rien — et le disque du VPS a deja bloque
    des deploiements. url() laisse donc passer une adresse absolue telle quelle. */
-const url = (n) => (n.startsWith('data:') || n.startsWith('http')) ? n : 'photos/' + n + '.jpg';
+/* Un nom de banque (« 02-vitrine--cari-poulet ») n'a ni slash ni extension ;
+   une photo de client est deja un chemin (« ../demo/mafate-cafe/photos/p01.jpg »).
+   Tester seulement http:// laissait recoller « photos/ » devant un chemin
+   relatif : photos/../demo/…/p01.jpg.jpg, neuf 404. */
+const url = (n) => (n.startsWith('data:') || n.indexOf('/') !== -1) ? n : 'photos/' + n + '.jpg';
 let E = null;      // état courant
 let selection = null;
 let modifs = 0;
@@ -786,9 +790,9 @@ const peindreAuto = () => {
 };
 if (champAuto) {
   try {
-    const memo = localStorage.getItem('fb-auto');
-    champAuto.checked = (memo === null) ? true : (memo === '1');
-  } catch (e) { champAuto.checked = true; }
+    localStorage.removeItem('fb-auto');
+    champAuto.checked = false;          // la porte est fermee tant qu'il n'est pas client
+  } catch (e) { champAuto.checked = false; }
   champAuto.addEventListener('change', () => {
     try { localStorage.setItem('fb-auto', champAuto.checked ? '1' : '0'); } catch (e) {}
     peindreAuto();
