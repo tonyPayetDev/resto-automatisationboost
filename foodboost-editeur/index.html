@@ -837,7 +837,11 @@ const peindreAuto = () => {
 if (champAuto) {
   try {
     localStorage.removeItem('fb-auto');
-    champAuto.checked = true;           // on compose pour programmer : c'est le defaut attendu
+    /* Etait force a true. Anodin tant que `publier` restait fige a false ;
+       depuis que la case declenche une vraie publication sur @foodboost, un
+       defaut a true fait publier quiconque confirme, sur une chaine jamais
+       eprouvee de bout en bout. Le restaurateur coche s'il le veut. */
+    champAuto.checked = false;
   } catch (e) { champAuto.checked = false; }
   champAuto.addEventListener('change', () => {
     try { localStorage.setItem('fb-auto', champAuto.checked ? '1' : '0'); } catch (e) {}
