@@ -102,6 +102,16 @@ main{max-width:1180px;margin-inline:auto;padding:22px 18px 120px;
 .v .carte li i{flex:1;border-bottom:1px dotted rgba(255,255,255,.28);transform:translateY(-3px)}
 /* L'étiquette de type de média. En bas à gauche : le haut droit est déjà pris
    par le triangle de lecture, et le centre par le texte du visuel. */
+/* Le bloc qui explique ce que fait le bouton. Encadré et non en petit texte :
+   c'est l'information qui décide si la personne clique ou pas. */
+.preuve{margin:16px 0 4px;padding:16px 18px;border-radius:12px;
+  background:rgba(255,180,0,.07);border:1px solid rgba(255,180,0,.34)}
+.preuve-t{display:block;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
+  color:#ffb400;font-weight:700;margin-bottom:8px}
+.preuve p{margin:0;font-size:.87rem;line-height:1.6}
+.preuve .preuve-suite{margin-top:10px;padding-top:10px;
+  border-top:1px solid rgba(255,180,0,.22);opacity:.9}
+
 .v .typ{position:absolute;left:5%;bottom:5%;z-index:4;font-size:.56rem;
   letter-spacing:.08em;text-transform:uppercase;font-weight:700;
   padding:3px 7px;border-radius:999px;background:rgba(8,8,8,.78);color:#fff;
@@ -390,29 +400,34 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
         <textarea id="legende" rows="4" maxlength="900"></textarea></label>
       <p class="aide" style="margin:6px 0 0">Les hashtags sont ajoutés à la fin —
         cinq au maximum, sinon Instagram refuse le post.</p>
-      <!-- La case restait cochable et le texte parlait encore de @foodboost et
-           tutoyait : c'est celui de l'atelier de Tony. Chez un restaurateur, la
-           publication directe n'est pas une option a cocher, c'est ce qui se
-           vend — et elle suppose que SON compte soit connecte. La case est donc
-           inerte et le bloc explique ce qu'il faut faire pour l'ouvrir. -->
-      <!-- Cochee par defaut : c'est le comportement attendu — on compose, on
-           programme. Elle ne veut PAS dire « publier » : rien ne peut partir sur
-           le compte du restaurateur tant qu'il ne l'a pas connecte, et elle ne
-           doit surtout pas publier sur @foodboost, qui est le compte de Tony. -->
+
+      <!-- Cadrage corrigé le 2026-09-09, après une lecture erronée de ma part :
+           publier sur @foodboost n'est PAS un défaut, c'est le principe de la
+           démonstration. Le restaurateur voit sa publication partir pour de vrai,
+           en un clic, sur un compte réel — c'est la preuve que la chaîne va
+           jusqu'au bout. Ce qu'il fallait corriger, ce n'est pas la destination,
+           c'est le fait qu'elle n'était expliquée nulle part : sans un mot, on
+           croit que sa publication part chez lui. -->
+      <div class="preuve">
+        <span class="preuve-t">Ce que fait le bouton</span>
+        <p>Votre publication part réellement sur <b>@foodboost</b>, notre compte de
+          démonstration. Elle apparaît sur Instagram à la date que vous avez choisie —
+          <b>vous pouvez aller la voir</b>. C'est la preuve que tout fonctionne :
+          le montage, la légende, la programmation, l'envoi.</p>
+        <p class="preuve-suite">Pour que ça parte sur <b>votre compte</b> à vous, il faut
+          le connecter une fois. Cinq minutes ensemble, et ensuite vous programmez votre
+          semaine sans y revenir.</p>
+      </div>
+
       <label class="bascule">
-        <!-- DECOCHEE par defaut. Tant que `publier` etait fige a false, cocher
-             ou non ne changeait rien. Depuis que la case pilote vraiment la
-             publication, la laisser cochee ferait publier sur @foodboost tout
-             visiteur qui confirme — sur une chaine jamais testee de bout en
-             bout. Publier est une action qu'on choisit, pas qu'on subit. -->
-        <input type="checkbox" id="auto">
+        <input type="checkbox" id="auto" checked>
         <span><b>Programmer cette publication</b> — elle est réservée à la date et à l'heure
           choisies plus haut.
-          <em id="auto-etat">Rien ne part tant que votre compte n'est pas connecté : vous validez avant.</em></span>
+          <em id="auto-etat">Elle part sur @foodboost, notre compte de démonstration.</em></span>
       </label>
       <a class="btn" id="demander-auto" href="#"
          style="display:block;margin-top:10px;text-align:center;text-decoration:none">
-        Comment activer la publication automatique</a>
+        Connecter mon propre compte Instagram</a>
       <p class="aide" id="auto-retour" style="margin:8px 0 0"></p>
     </div>
   </section>
@@ -869,7 +884,8 @@ function peindreRecap() {
   const quand = (document.getElementById('d-quand') || {}).textContent || 'créneau non choisi';
   const n = calculerTags().length;
   const debut = (champLegende ? champLegende.value : '').trim().split('\n')[0] || '(légende vide)';
-  z.innerHTML = 'Part sur <b>Instagram @foodboost</b> · reel 9:16 · <b>' + quand.replace(' — heure de La Réunion.', '') + '</b><br>'
+  /* On nomme la démonstration au lieu de laisser croire que ça part chez lui. */
+  z.innerHTML = 'Part sur <b>@foodboost</b> <span style="opacity:.7">(notre compte de démonstration)</span> · reel 9:16 · <b>' + quand.replace(' — heure de La Réunion.', '') + '</b><br>'
     + '« ' + debut.slice(0, 46) + (debut.length > 46 ? '…' : '') + ' » · ' + n + ' hashtags · '
     + (modeAuto() ? '<b>publication automatique</b>' : 'relecture de Tony avant publication');
 }
