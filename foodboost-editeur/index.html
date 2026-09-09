@@ -954,7 +954,15 @@ document.getElementById('conf-ok').addEventListener('click', () => {
            dire « programme-la », pas « publie-la » : la publication demande son
            compte connecte, et surtout elle ne doit jamais partir sur @foodboost,
            qui est le compte de Tony. */
-        legende: sortie.legende, auto: false, publier: false, programmer: modeAuto(),
+        /* `publier` suit desormais la case du restaurateur. La chaine n8n
+           « Feed — quelqu'un est arrive au bout » fait deja les deux etapes :
+           elle rend la video, puis la televerse EN BINAIRE vers Blotato (pas
+           par URL, que Cloudflare bloque) et publie. Sa porte est
+           `if (src.publier !== true) return []` : tant qu'on envoyait false,
+           tout s'arretait apres le rendu.
+           La publication part sur @foodboost, le compte de demonstration —
+           jamais sur le compte du restaurant, qui n'est pas connecte. */
+        legende: sortie.legende, auto: false, publier: modeAuto(), programmer: modeAuto(),
         photos: sortie.photos, destination: sortie.destination,
         poste: sortie.poste,
       }),
@@ -963,7 +971,9 @@ document.getElementById('conf-ok').addEventListener('click', () => {
   dlgConf.close();
   document.getElementById('dlg-t').textContent = 'C’est programmé';
   document.getElementById('dlg-p').textContent =
-    ('Votre composition est transmise. Rien n\'est publié : Tony vous confirme la mise en ligne, et vous validez avant que quoi que ce soit ne parte.')
+    (modeAuto()
+      ? 'Votre composition part au rendu, puis en ligne sur le compte de démonstration @foodboost. Comptez quelques minutes — Tony vous envoie le lien.'
+      : 'Votre composition est transmise. Rien n\'est publié : cochez « Programmer cette publication » si vous voulez la voir en ligne.')
     + (televersees ? ' ' + televersees + ' photo(s) que tu as envoyée(s) restent dans ce navigateur : le rendu utilisera la banque à leur place.' : '');
   document.getElementById('dlg-json').textContent = JSON.stringify(sortie, null, 2);
   /* La suite : on pre-remplit avec le nom, sinon Tony recoit un message anonyme
