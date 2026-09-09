@@ -255,6 +255,28 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
   .pied .bar .etat{flex:0 0 100%;order:-1}
   .pied button{flex:1}
   main{padding-bottom:172px}
+
+  /* ── Corrections tactiles, relevees a la mesure sur 390x844 ───────────
+     Ce qui n'allait pas : le titre de la banque etait un flex sur une ligne
+     et se retrouvait ecrase a 65 px pour 209 px de contenu — les mots se
+     superposaient aux vignettes. Le champ fichier faisait 21 px de haut, et
+     « Termine » 38 px, sous le seuil de 44 px ou le pouce vise juste. Les
+     champs date et heure, a 135 px, tronquaient leur propre valeur
+     (« 09/10/202 »). */
+  .banque-titre{display:block;line-height:1.45;margin:16px 0 9px}
+  .banque-titre em{display:block;margin-top:3px}
+  .sto{overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+  .sto::-webkit-scrollbar{display:none}
+  .sto div{flex:0 0 auto}
+  input[type=file]{min-height:46px;width:100%;padding:12px;border-radius:9px;
+    border:1px solid #2a2f42;background:#12141d;color:#9aa4b8;font-size:14px}
+  .second{min-height:44px;padding-inline:16px}
+  /* Date et heure passent chacune sur toute la largeur : cote a cote elles
+     coupaient l'annee. */
+  .creneau label{flex:1 1 100%}
+  .creneau input{width:100%}
+  /* Le lien « publication automatique » debordait sur deux lignes collees. */
+  .destination a,.suite a{overflow-wrap:anywhere;line-height:1.5}
 }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -990,6 +1012,63 @@ document.getElementById('famille').value = E.famille;
      dès l'ouverture, dans l'ordre, et la banque ne complète que ce qui reste.
      On ne le refait pas si l'état gardé est déjà celui de ce client : sinon un
      retour sur la page effacerait les vignettes que Tony vient de changer. */
+  /* L'IDENTITE d'abord. Sans ces lignes, l'editeur chargeait bien les photos
+     du client mais gardait le nom, la ville et les hashtags du restaurant de
+     demonstration : un prospect ouvrait sa page et lisait « Chez Marlene ».
+     C'est le premier chose qu'il voit, et ca disqualifie tout le reste. */
+  if (client && client.nom) {
+    E.nom = client.nom;
+    var champNom = document.getElementById('nom');
+    if (champNom) champNom.value = client.nom;
+    /* La ville n'est pas dans la fiche : on la retire plutot que de laisser
+       « Saint-Pierre » sur un etablissement qui n'y est pas. */
+    if (!client.ville) {
+      E.ville = '';
+      var champVille = document.getElementById('ville');
+      if (champVille) champVille.value = '';
+    } else {
+      E.ville = client.ville;
+      var cv = document.getElementById('ville');
+      if (cv) cv.value = client.ville;
+    }
+    /* La legende et les hashtags vivaient dans l'etat garde du navigateur :
+       le nom changeait en tete mais le texte poste disait toujours
+       « Chez Marlene » et taguait #chezmarlene. On les regenere des que
+       l'identite change. */
+    /* La fiche client ne declare pas la cuisine. Laisser « creole » par
+       defaut taguait Delices Thai en #cuisinecreole #rougail et ecrivait
+       « en cuisine creole » sous un thai — le prospect voit tout de suite
+       qu'on ne l'a pas regarde. On neutralise : les generiques deviennent
+       #restaurant et la legende « La carte du jour. » Tony choisit ensuite
+       la vraie famille dans le selecteur, ce qui reactive tout. */
+    if (!client.famille) {
+      E.famille = '';
+      var cf = document.getElementById('famille');
+      if (cf) cf.value = '';
+      /* Le type et le menu venaient du restaurant de demonstration : un thai
+         affichait « Restaurant creole » et « Rougail saucisse, Cari poulet ».
+         On ne remplace pas par d'autres plats inventes — on pose une carte a
+         completer, ce qui est justement ce que le bouton leur demande de
+         faire. Des que Tony choisit la vraie cuisine dans le selecteur, les
+         menus d'origine reviennent. */
+      E.type = '';
+      E.menu = [['Menu du jour', ['Votre plat du jour', 'Votre entrée', 'Votre dessert']],
+                ['À la carte',   ['À compléter', 'À compléter', 'À compléter']]];
+    }
+    if (champLegende) champLegende.value = legendeAuto();
+    garder();
+    peindre();
+    /* peindre() ne touche pas la zone des hashtags : elle a son propre
+       peintre, declenche seulement par la saisie manuelle des champs. Sans
+       cet appel, l'en-tete affichait « Fogo » pendant que les tags restaient
+       #chezmarlene — le pire des deux mondes. */
+    if (typeof peindreTags === 'function') peindreTags();
+    if (typeof rafraichirLegende === 'function') rafraichirLegende();
+    /* Le recapitulatif garde la premiere ligne de la legende : sans ce rappel
+       il annonçait encore « Chez Marlene » sous un feed au bon nom. */
+    if (typeof peindreRecap === 'function') peindreRecap();
+  }
+
   if (client && client.photos && client.photos.length && E.client !== slug) {
     /* Poser les photos du client dans l'apercu, pas seulement dans la banque :
        sinon l'image qu'on envoie montre des plats de stock, c'est-a-dire le
