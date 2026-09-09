@@ -270,7 +270,13 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
   .sto div{flex:0 0 auto}
   input[type=file]{min-height:46px;width:100%;padding:12px;border-radius:9px;
     border:1px solid #2a2f42;background:#12141d;color:#9aa4b8;font-size:14px}
+  /* « Termine » restait a 38 px : une regle plus specifique le pilotait.
+     La case a cocher faisait 22 px — c'est ELLE qui declenche la publication,
+     autant qu'elle soit atteignable du pouce. */
   .second{min-height:44px;padding-inline:16px}
+  .atelier-tete .second,button.second{min-height:44px}
+  input[type=checkbox]{width:26px;height:26px;accent-color:#f0803c}
+  label:has(> input[type=checkbox]){min-height:44px;display:flex;align-items:flex-start;gap:12px}
   /* Date et heure passent chacune sur toute la largeur : cote a cote elles
      coupaient l'annee. */
   .creneau label{flex:1 1 100%}
