@@ -394,7 +394,12 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
            le compte du restaurateur tant qu'il ne l'a pas connecte, et elle ne
            doit surtout pas publier sur @foodboost, qui est le compte de Tony. -->
       <label class="bascule">
-        <input type="checkbox" id="auto" checked>
+        <!-- DECOCHEE par defaut. Tant que `publier` etait fige a false, cocher
+             ou non ne changeait rien. Depuis que la case pilote vraiment la
+             publication, la laisser cochee ferait publier sur @foodboost tout
+             visiteur qui confirme — sur une chaine jamais testee de bout en
+             bout. Publier est une action qu'on choisit, pas qu'on subit. -->
+        <input type="checkbox" id="auto">
         <span><b>Programmer cette publication</b> — elle est réservée à la date et à l'heure
           choisies plus haut.
           <em id="auto-etat">Rien ne part tant que votre compte n'est pas connecté : vous validez avant.</em></span>
