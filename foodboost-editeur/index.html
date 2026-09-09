@@ -873,7 +873,15 @@ if (boutonAuto) boutonAuto.addEventListener('click', function (ev) {
   var r = document.getElementById('auto-retour');
   boutonAuto.style.pointerEvents = 'none';
   fetch('https://n7n.automatisationboost.com/webhook/demo-planif', {
-    method: 'POST', headers: { 'Content-Type': 'text/plain' }, keepalive: true,
+    /* application/json et non text/plain : en text/plain, n8n ne parse pas le
+       corps et le workflow lit une CHAINE. Tous les champs valaient alors
+       undefined — le mail d'alerte annonçait « undefined a monte son feed »,
+       « Photos choisies : 0 », « Email : NON DONNE » et un lien editeur sans
+       slug, alors que l'execution etait en succes. Verifie avant de changer :
+       le preflight OPTIONS des deux webhooks repond 204 avec
+       access-control-allow-origin sur resto.automatisationboost.com, donc le
+       navigateur ne bloquera pas. */
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true,
     body: JSON.stringify({
       type: 'mode-auto',
       slug: new URLSearchParams(location.search).get('client') || '',
@@ -932,7 +940,7 @@ document.getElementById('conf-ok').addEventListener('click', () => {
        restaurateur son recapitulatif — c'est lui qui ferme la boucle cote
        client. On garde les deux plutot que d'en casser un qui tourne. */
     fetch('https://n7n.automatisationboost.com/webhook/demo-planif', {
-      method: 'POST', headers: { 'Content-Type': 'text/plain' }, keepalive: true,
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, keepalive: true,
       body: JSON.stringify({
         type: 'planification',
         slug: new URLSearchParams(location.search).get('client') || '',
