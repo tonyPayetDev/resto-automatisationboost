@@ -100,6 +100,14 @@ main{max-width:1180px;margin-inline:auto;padding:22px 18px 120px;
 .v .carte li{list-style:none;font-size:.6rem;line-height:1.6;
   display:flex;gap:5px;align-items:baseline}
 .v .carte li i{flex:1;border-bottom:1px dotted rgba(255,255,255,.28);transform:translateY(-3px)}
+/* L'étiquette de type de média. En bas à gauche : le haut droit est déjà pris
+   par le triangle de lecture, et le centre par le texte du visuel. */
+.v .typ{position:absolute;left:5%;bottom:5%;z-index:4;font-size:.56rem;
+  letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+  padding:3px 7px;border-radius:999px;background:rgba(8,8,8,.78);color:#fff;
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);line-height:1}
+.v .typ-v{color:#ffd24a}
+.v .typ-c{color:#7fd3ff}
 .v .play{position:absolute;right:7%;top:6%;z-index:3;width:20px;height:20px;
   border:2px solid rgba(255,255,255,.92);border-radius:50%;background:rgba(0,0,0,.34)}
 .v .play::after{content:"";position:absolute;left:6px;top:4px;
@@ -293,15 +301,13 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
   <div class="bar">
     <span class="marque">FOOD<em>BOOST</em> · éditeur</span>
     <span class="grandir"></span>
-    <label class="champ">Ambiance
-      <select id="ambiance">
-        <option value="moderne">Moderne et minimaliste</option>
-        <option value="chic">Chic et épurée</option>
-        <option value="tropicale">Tropicale et colorée</option>
-        <option value="chaleureuse">Chaleureuse et familiale</option>
-        <option value="rustique">Rustique et authentique</option>
-      </select>
-    </label>
+    <!-- Le sélecteur d'ambiance a été retiré le 2026-09-09 : cinq palettes à
+         choisir avant même d'avoir vu son feed, c'est une décision demandée trop
+         tôt à quelqu'un qui découvre l'outil, et aucun prospect n'y touchait.
+         La palette reste pilotée par `E.ambiance`, figée sur « moderne » —
+         donc rien à réécrire ailleurs dans le fichier si on la réactive un jour.
+         Le champ caché garde la valeur pour tout le code qui la lit encore. -->
+    <input type="hidden" id="ambiance" value="moderne">
   </div>
 </header>
 
@@ -562,16 +568,24 @@ function peindre() {
   document.getElementById('grille').innerHTML = PLAN.map((t, i) => {
     const ph = url(E.photos[t.p]);
     const play = t.play ? '<div class="play"></div>' : '';
-    if (t.r === 'photo') return `<div class="v" data-i="${i}"><img src="${ph}" alt=""></div>`;
+    /* Le type de média, écrit en toutes lettres sur la vignette. Le petit
+       triangle seul ne disait rien : un restaurateur ne devine pas qu'il
+       distingue une vidéo d'une photo. Demandé par Tony le 2026-09-09.
+       Trois types seulement, et aucun n'est généré par une IA : la vidéo est un
+       montage HyperFrames de ses propres photos, l'image est sa photo, le
+       carrousel est une suite de ses photos. */
+    const type = t.play ? 'Vidéo' : (t.r === 'menu' ? 'Carrousel' : 'Image');
+    const etiq = `<span class="typ ${t.play ? 'typ-v' : (t.r === 'menu' ? 'typ-c' : 'typ-i')}">${type}</span>`;
+    if (t.r === 'photo') return `<div class="v" data-i="${i}"><img src="${ph}" alt="">${etiq}</div>`;
     if (t.r === 'hook') return `<div class="v" data-i="${i}"><div class="voile"><img src="${ph}" alt=""></div>
-      <div class="mot"><b>${E.hooks[t.h][0]}<br><em>${E.hooks[t.h][1]}</em></b><hr></div>${play}</div>`;
+      <div class="mot"><b>${E.hooks[t.h][0]}<br><em>${E.hooks[t.h][1]}</em></b><hr></div>${play}${etiq}</div>`;
     if (t.r === 'bas') return `<div class="v" data-i="${i}"><img src="${ph}" alt="">
-      <div class="bas"><b>${E.hooks[t.h][0]}<br><em>${E.hooks[t.h][1]}</em></b></div>${play}</div>`;
+      <div class="bas"><b>${E.hooks[t.h][0]}<br><em>${E.hooks[t.h][1]}</em></b></div>${play}${etiq}</div>`;
     if (t.r === 'menu') { const [ti, pl] = E.menu[t.m];
       return `<div class="v" data-i="${i}"><img src="${ph}" alt="">
-        <div class="carte"><h4>${ti}</h4><ul>${pl.map((d) => `<li>${d}<i></i></li>`).join('')}</ul></div></div>`; }
+        <div class="carte"><h4>${ti}</h4><ul>${pl.map((d) => `<li>${d}<i></i></li>`).join('')}</ul></div>${etiq}</div>`; }
     return `<div class="v" data-i="${i}"><div class="voile"><img src="${ph}" alt=""></div>
-      <div class="sig"><b>${E.sig[0]}<em>${E.sig[1]}</em></b></div></div>`;
+      <div class="sig"><b>${E.sig[0]}<em>${E.sig[1]}</em></b></div>${etiq}</div>`;
   }).join('');
 
   document.querySelectorAll('.v').forEach((v) => {
@@ -676,10 +690,7 @@ for (const id of ['nom', 'type', 'ville']) {
     rafraichirLegende(); peindreTags(); peindreRecap();
   });
 }
-document.getElementById('ambiance').addEventListener('change', (e) => {
-  if (!E) return;
-  E.ambiance = e.target.value; modifs++; garder(); peindre();
-});
+/* L'écouteur du sélecteur d'ambiance est parti avec le sélecteur. */
 document.getElementById('famille').addEventListener('change', (e) => {
   if (!E) return;
   E = Object.assign(neuf(e.target.value), { nom:E.nom, type:E.type, ville:E.ville, ambiance:E.ambiance });
