@@ -1,0 +1,5 @@
+file '/work/resto-automatisationboost/video-demo/work/tmp/le-nautile-beach-hotel/c0.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/le-nautile-beach-hotel/c1.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/le-nautile-beach-hotel/c2.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/le-nautile-beach-hotel/c3.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/le-nautile-beach-hotel/c4.mp4'

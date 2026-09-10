@@ -1,0 +1,5 @@
+file '/work/resto-automatisationboost/video-demo/work/tmp/mafate-cafe/c0.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/mafate-cafe/c1.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/mafate-cafe/c2.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/mafate-cafe/c3.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/mafate-cafe/c4.mp4'

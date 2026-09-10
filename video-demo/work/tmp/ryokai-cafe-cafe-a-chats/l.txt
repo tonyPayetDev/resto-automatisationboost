@@ -1,0 +1,5 @@
+file '/work/resto-automatisationboost/video-demo/work/tmp/ryokai-cafe-cafe-a-chats/c0.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/ryokai-cafe-cafe-a-chats/c1.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/ryokai-cafe-cafe-a-chats/c2.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/ryokai-cafe-cafe-a-chats/c3.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/ryokai-cafe-cafe-a-chats/c4.mp4'

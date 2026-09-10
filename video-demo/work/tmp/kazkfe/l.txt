@@ -1,0 +1,5 @@
+file '/work/resto-automatisationboost/video-demo/work/tmp/kazkfe/c0.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/kazkfe/c1.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/kazkfe/c2.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/kazkfe/c3.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/kazkfe/c4.mp4'

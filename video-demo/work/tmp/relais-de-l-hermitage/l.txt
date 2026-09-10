@@ -1,0 +1,5 @@
+file '/work/resto-automatisationboost/video-demo/work/tmp/relais-de-l-hermitage/c0.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/relais-de-l-hermitage/c1.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/relais-de-l-hermitage/c2.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/relais-de-l-hermitage/c3.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/relais-de-l-hermitage/c4.mp4'

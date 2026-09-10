@@ -1,0 +1,5 @@
+file '/work/resto-automatisationboost/video-demo/work/tmp/fogo/c0.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/fogo/c1.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/fogo/c2.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/fogo/c3.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/fogo/c4.mp4'

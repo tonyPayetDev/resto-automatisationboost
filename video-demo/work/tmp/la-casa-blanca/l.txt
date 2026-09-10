@@ -1,0 +1,5 @@
+file '/work/resto-automatisationboost/video-demo/work/tmp/la-casa-blanca/c0.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/la-casa-blanca/c1.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/la-casa-blanca/c2.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/la-casa-blanca/c3.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/la-casa-blanca/c4.mp4'

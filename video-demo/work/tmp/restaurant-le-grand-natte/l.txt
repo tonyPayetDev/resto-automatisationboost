@@ -1,0 +1,5 @@
+file '/work/resto-automatisationboost/video-demo/work/tmp/restaurant-le-grand-natte/c0.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/restaurant-le-grand-natte/c1.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/restaurant-le-grand-natte/c2.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/restaurant-le-grand-natte/c3.mp4'
+file '/work/resto-automatisationboost/video-demo/work/tmp/restaurant-le-grand-natte/c4.mp4'

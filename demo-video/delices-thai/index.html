@@ -1,0 +1,45 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Délices Thaï — vos publications en vidéo</title>
+<style>
+*{box-sizing:border-box;margin:0}
+body{background:#0b0b0d;color:#f4f4f6;font:400 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;
+  display:grid;place-items:center;min-height:100vh;padding:28px 18px 60px}
+.b{width:min(440px,94vw)}
+.eyebrow{font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:#f0a500;font-weight:700}
+h1{font-size:27px;line-height:1.18;margin:8px 0 6px;letter-spacing:-.02em}
+p.sub{color:#9b9ba4;font-size:14.5px;margin:0 0 20px}
+video{width:100%;border-radius:14px;display:block;background:#000;border:1px solid #26262c}
+.cta{display:block;margin:22px 0 0;background:#f0a500;color:#0b0b0d;text-align:center;
+  font-weight:800;font-size:17px;padding:16px 20px;border-radius:12px;text-decoration:none}
+.cta:hover{background:#ffb821}
+.sec{margin-top:26px;border-top:1px solid #26262c;padding-top:20px}
+.sec h2{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#f0a500;margin:0 0 10px}
+ul{color:#9b9ba4;font-size:14.5px;padding-left:18px;margin:0} li{margin-bottom:7px}
+.pied{margin-top:28px;color:#6d6d78;font-size:12.5px;line-height:1.7}
+.pied a{color:#9b9ba4}
+</style></head><body><div class="b">
+<div class="eyebrow">FoodBoost</div>
+<h1>Délices Thaï, voici vos publications.</h1>
+<p class="sub">Faites avec <b>vos photos</b>, celles de votre site. Rien n'a été publié : c'est un exemple, pour vous.</p>
+<video id="v" src="https://assets.automatisationboost.com/foodboost/delices-thai/demo.mp4" controls playsinline preload="metadata"></video>
+<a class="cta" id="tester" href="https://resto.automatisationboost.com/editeur/?client=delices-thai">Tester avec vos autres photos →</a>
+<div class="sec"><h2>Ce que vous venez de voir</h2><ul>
+<li>Trois publications montées à partir de vos propres photos</li>
+<li>Légende, hashtags et heure de publication écrits pour vous</li>
+<li>Vous pouvez changer les photos et les textes vous-même sur la page d'essai</li>
+</ul></div>
+<p class="pied">Envoyé par Tony PAYET · La Réunion · <a href="https://automatisationboost.com">automatisationboost.com</a><br>
+Vous ne voulez plus de messages de ma part ? Répondez « stop » à l'email, je vous retire tout de suite.</p>
+</div>
+<script>
+// Suivi minimal : une ouverture, un clic. Aucun cookie, aucun tiers.
+var P="https://n7n.automatisationboost.com/webhook/demo-clic";
+function dire(q){try{navigator.sendBeacon(P,new Blob([JSON.stringify(
+  {restaurant:"delices-thai",quoi:q,source:location.search.replace("?","")})],{type:"application/json"}));}catch(e){}}
+dire("ouverture");
+document.getElementById("tester").addEventListener("click",function(){dire("clic-tester");});
+var vu=false;
+document.getElementById("v").addEventListener("play",function(){if(!vu){vu=true;dire("lecture-video");}});
+</script></body></html>
