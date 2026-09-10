@@ -1236,5 +1236,20 @@ peindreAuto();
 peindreTags();
 peindreRecap();
 </script>
+<script>
+/* Suivi d'arrivee depuis le demarchage : on saura qui a REELLEMENT ouvert
+   l'editeur, pas seulement une page de presentation. Aucun cookie, aucun
+   tiers, une seule balise au chargement. */
+(function(){
+  try{
+    var q=new URLSearchParams(location.search);
+    var c=q.get('client'); if(!c) return;
+    var src=q.get('src')||''; if(!src) return;   // seulement si on vient d'un lien trace
+    navigator.sendBeacon('https://n7n.automatisationboost.com/webhook/demo-clic',
+      new Blob([JSON.stringify({restaurant:c,quoi:'ouverture-editeur',source:src})],
+               {type:'application/json'}));
+  }catch(e){}
+})();
+</script>
 </body>
 </html>
