@@ -38,14 +38,39 @@ carte c4.mp4 "$C/fin.png"       2.80
 # soit leur nom — sinon la moitie des clients echoue.
 # Certains dossiers contiennent un SVG renomme .jpg (Mediterraneo) : ffmpeg
 # n'a pas de decodeur SVG et la passe meurt. On verifie l'ENTETE, pas le nom.
-mapfile -t TOUTES < <(ls "$PH"/*.jpg "$PH"/*.jpeg "$PH"/*.png 2>/dev/null | sort)
-PHOTOS=()
+mapfile -t TOUTES < <(ls "$PH"/* 2>/dev/null | sort)
+VALIDES=()
 for f in "${TOUTES[@]}"; do
-  h=$(head -c 4 "$f" | od -An -tx1 | tr -d ' \n')
-  case "$h" in ffd8ff*|89504e47) PHOTOS+=("$f");; esac
-  [ "${#PHOTOS[@]}" -ge 3 ] && break
+  h=$(head -c 12 "$f" | od -An -tx1 | tr -d ' \n')
+  # JPEG (ffd8ff), PNG (89504e47), WebP (RIFF....WEBP). Otent'ik Pizza sert des
+  # WebP renommes .jpg : les rejeter privait le client de 7 photos sur 9.
+  # Le SVG renomme .jpg (Mediterraneo) reste ecarte : ffmpeg ne le decode pas.
+  case "$h" in
+    ffd8ff*|89504e47*) VALIDES+=("$f");;
+    52494646*) [ "${h:16:8}" = "57454250" ] && VALIDES+=("$f");;
+  esac
 done
-[ "${#PHOTOS[@]}" -ge 3 ] || { echo "moins de 3 photos pour $SLUG (${#PHOTOS[@]})"; exit 3; }
+# Le choix des photos est fait A L'OEIL, pas par heuristique : la moitie des
+# dossiers contient des LOGOS et des BANDEAUX PUBLICITAIRES (Kazkfe affichait
+# une pub de machine a 1499 EUR). Une statistique de couleurs ne les distingue
+# pas d'un plat ; il faut regarder. work/choix.tsv porte les index retenus.
+CH=$(awk -F'\t' -v s="$SLUG" '$1==s{print $2}' work/choix.tsv)
+PHOTOS=()
+if [ -n "$CH" ]; then
+  IFS=',' read -ra IDX <<< "$CH"
+  for k in "${IDX[@]}"; do
+    f="${VALIDES[$((k-1))]}"
+    # un index hors bornes donnait un chemin VIDE et ffmpeg mourait sur
+    # « Error opening input file . » — on refuse franchement.
+    [ -n "$f" ] && [ -f "$f" ] || { echo "index $k hors bornes pour $SLUG (${#VALIDES[@]} images valides)"; exit 4; }
+    PHOTOS+=("$f")
+  done
+else
+  PHOTOS=("${VALIDES[@]:0:3}")
+fi
+N=${#PHOTOS[@]}
+[ "$N" -ge 2 ] || { echo "moins de 2 photos exploitables pour $SLUG"; exit 3; }
+
 i=1
 for p in "${PHOTOS[@]}"; do
   sens=$([ $((i%2)) -eq 1 ] && echo bas || echo haut)
@@ -56,7 +81,8 @@ for p in "${PHOTOS[@]}"; do
   i=$((i+1))
 done
 
-: > "$T/l.txt"; for f in c0 c1 c2 c3 c4; do echo "file '$(pwd)/$T/$f.mp4'" >> "$T/l.txt"; done
+LISTE=(c0); for ((k=1;k<=N;k++)); do LISTE+=("c$k"); done; LISTE+=(c4)
+: > "$T/l.txt"; for f in "${LISTE[@]}"; do echo "file '$(pwd)/$T/$f.mp4'" >> "$T/l.txt"; done
 $FF -y -loglevel error -f concat -safe 0 -i "$T/l.txt" -c copy "$T/muet.mp4"
 
 DUR=$($FF -y -loglevel error -i "$T/muet.mp4" -f null - 2>&1 >/dev/null; ffprobe -v error -show_entries format=duration -of csv=p=0 "$T/muet.mp4")

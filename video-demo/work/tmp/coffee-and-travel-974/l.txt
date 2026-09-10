@@ -1,5 +1,4 @@
 file '/work/resto-automatisationboost/video-demo/work/tmp/coffee-and-travel-974/c0.mp4'
 file '/work/resto-automatisationboost/video-demo/work/tmp/coffee-and-travel-974/c1.mp4'
 file '/work/resto-automatisationboost/video-demo/work/tmp/coffee-and-travel-974/c2.mp4'
-file '/work/resto-automatisationboost/video-demo/work/tmp/coffee-and-travel-974/c3.mp4'
 file '/work/resto-automatisationboost/video-demo/work/tmp/coffee-and-travel-974/c4.mp4'

@@ -1,5 +1,4 @@
 file '/work/resto-automatisationboost/video-demo/work/tmp/bodega-saint-pierre/c0.mp4'
 file '/work/resto-automatisationboost/video-demo/work/tmp/bodega-saint-pierre/c1.mp4'
 file '/work/resto-automatisationboost/video-demo/work/tmp/bodega-saint-pierre/c2.mp4'
-file '/work/resto-automatisationboost/video-demo/work/tmp/bodega-saint-pierre/c3.mp4'
 file '/work/resto-automatisationboost/video-demo/work/tmp/bodega-saint-pierre/c4.mp4'
