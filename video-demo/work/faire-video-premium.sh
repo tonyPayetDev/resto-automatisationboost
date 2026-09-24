@@ -122,6 +122,20 @@ carte(){ $FF -y -loglevel error -loop 1 -framerate 30 -i "$2" -t "$3" \
 # ---- Le texte par-dessus un plan, en fondu --------------------------------
 # UN SEUL overlay par passe : empiler les overlays fait tuer le processus par
 # le noyau, sans erreur et sans image produite (lecon reel-nexeus).
+# ---- Le texte ANIME par-dessus un plan ------------------------------------
+# `cartes-anim.mjs` sort une seconde d'animation (30 images transparentes) par
+# legende. On la joue, puis `tpad=stop_mode=clone` GELE la derniere image pour
+# le reste du plan : animer les 120 images couterait quatre fois le rendu pour
+# trois secondes ou plus rien ne bouge.
+# Si le dossier n'existe pas, on retombe sur le PNG fige de cartes.mjs —
+# le montage ne doit pas echouer parce qu'une animation manque.
+texte_anime(){ # 1:sortie 2:plan 3:dossier images 4:duree
+  local reste; reste=$(awk -v d="$4" 'BEGIN{printf "%.2f", d-1.0}')
+  $FF -y -loglevel error -i "$T/$2" -framerate 30 -i "$3/%04d.png" \
+    -filter_complex "[1:v]tpad=stop_mode=clone:stop_duration=$reste,format=rgba[t];\
+[0:v][t]overlay=0:0:format=auto:shortest=1[o]" -map "[o]" -an \
+    -c:v libx264 -preset veryfast -crf 18 -pix_fmt yuv420p "$T/$1"; }
+
 texte(){ # 1:sortie 2:plan 3:png texte 4:duree
   # `-loop 1 -framerate 30` sur le PNG n'est PAS decoratif : sans lui l'image
   # se decode en UNE seule frame, le fondu d'alpha l'attrape a t=0 ou elle est
@@ -165,8 +179,13 @@ carte c0.mp4 "$C/ouverture.png" "$DOUV"
 carte cf.mp4 "$C/fin.png"       "$DFIN"
 i=1
 for p in "${PHOTOS[@]}"; do
-  plan  "b$i.mp4" "$p" "$DPHOTO"
-  texte "c$i.mp4" "b$i.mp4" "$C/l$i.png" "$DPHOTO"
+  plan "b$i.mp4" "$p" "$DPHOTO"
+  if [ -d "$C/anim/l$i" ]; then
+    texte_anime "c$i.mp4" "b$i.mp4" "$C/anim/l$i" "$DPHOTO"
+  else
+    echo "   (pas d'animation pour l$i — on reprend le PNG fige)"
+    texte "c$i.mp4" "b$i.mp4" "$C/l$i.png" "$DPHOTO"
+  fi
   i=$((i+1))
 done
 
@@ -190,14 +209,51 @@ done
 FC="${FC%;}"
 
 $FF -y -loglevel error "${ENTREES[@]}" -filter_complex "$FC" -map "[vout]" -an \
-  -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p "$T/muet.mp4"
+  -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p "$T/corps.mp4"
+
+# ---- Le carton de fin FoodBoost -------------------------------------------
+# Le meme pour tous : c'est une signature de marque, pas une carte de visite
+# d'etablissement. Sa voix est gardee a part pour etre remise SOUS la musique
+# au bon instant — un simple concat ecraserait l'une ou l'autre.
+OUTRO="rendus-premium/outro-foodboost.mp4"
+if [ -f "$OUTRO" ]; then
+  DUR_CORPS=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$T/corps.mp4")
+  DUR_OUTRO=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$OUTRO")
+  OFF_OUT=$(awk -v a="$DUR_CORPS" -v d="$XDUR" 'BEGIN{printf "%.3f", a-d}')
+  $FF -y -loglevel error -i "$T/corps.mp4" -i "$OUTRO" \
+    -filter_complex "[0:v][1:v]xfade=transition=fade:duration=$XDUR:offset=$OFF_OUT[v]" \
+    -map "[v]" -an -c:v libx264 -preset medium -crf 18 -pix_fmt yuv420p "$T/muet.mp4"
+  # La voix du carton, decalee jusqu'a l'endroit ou le carton commence.
+  $FF -y -loglevel error -i "$OUTRO" -vn -c:a pcm_s16le -ar 48000 -ac 2 "$T/voix-outro.wav" 2>/dev/null \
+    && VOIX_OUTRO="$T/voix-outro.wav" || VOIX_OUTRO=""
+  DEB_OUTRO=$(awk -v a="$OFF_OUT" 'BEGIN{printf "%d", a*1000}')
+  echo "   carton de fin ajouté (+$(awk -v d="$DUR_OUTRO" -v x="$XDUR" 'BEGIN{printf "%.1f", d-x}') s)"
+else
+  echo "   ⚠ pas de carton de fin (rendus-premium/outro-foodboost.mp4 absent)"
+  cp "$T/corps.mp4" "$T/muet.mp4"; VOIX_OUTRO=""
+fi
 
 DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$T/muet.mp4")
 FOUT=$(awk -v d="$DUR" 'BEGIN{v=d-1.8; if(v<0)v=0; printf "%.2f", v}')
 $FF -y -loglevel error -stream_loop -1 -i "$BGM" -t "$DUR" \
   -af "volume=$VOL,afade=t=in:st=0:d=1.4,afade=t=out:st=$FOUT:d=1.8,loudnorm=I=-16:TP=-1.5:LRA=9" \
   -ar 48000 -ac 2 "$T/mus.wav"
-$FF -y -loglevel error -i "$T/muet.mp4" -i "$T/mus.wav" -map 0:v -map 1:a -shortest \
-  -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -profile:v high -level 4.0 \
-  -c:a aac -b:a 160k -movflags +faststart "rendus-premium/$SLUG-$LOOK.mp4"
+if [ -n "$VOIX_OUTRO" ] && [ -f "$VOIX_OUTRO" ]; then
+  # La voix du carton par-dessus la musique. `sidechaincompress` prend la
+  # MUSIQUE en PREMIERE entree et la voix en seconde : inverse, il n'y a
+  # aucune erreur — c'est la musique qui ecrase la voix, et on ne s'en apercoit
+  # qu'au casque. `amix` reste en normalize=0, sinon la voix baisse au moment
+  # ou elle entre. `adelay=...:all=1`, sinon seul le canal gauche est decale.
+  $FF -y -loglevel error -i "$T/muet.mp4" -i "$T/mus.wav" -i "$VOIX_OUTRO" \
+    -filter_complex "[2:a]adelay=${DEB_OUTRO}:all=1,volume=1.0,apad=whole_dur=$DUR,asplit=2[vx1][vx2];\
+[1:a][vx1]sidechaincompress=threshold=0.05:ratio=7:attack=5:release=240[duck];\
+[duck][vx2]amix=inputs=2:normalize=0:dropout_transition=0,alimiter=limit=0.94[a]" \
+    -map 0:v -map "[a]" -t "$DUR" \
+    -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -profile:v high -level 4.0 \
+    -c:a aac -b:a 160k -movflags +faststart "rendus-premium/$SLUG-$LOOK.mp4"
+else
+  $FF -y -loglevel error -i "$T/muet.mp4" -i "$T/mus.wav" -map 0:v -map 1:a -shortest \
+    -c:v libx264 -preset slow -crf 19 -pix_fmt yuv420p -profile:v high -level 4.0 \
+    -c:a aac -b:a 160k -movflags +faststart "rendus-premium/$SLUG-$LOOK.mp4"
+fi
 echo "✅ rendus-premium/$SLUG-$LOOK.mp4 · $(ffprobe -v error -show_entries format=duration -of csv=p=0 "rendus-premium/$SLUG-$LOOK.mp4") s"
