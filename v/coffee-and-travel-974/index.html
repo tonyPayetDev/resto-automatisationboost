@@ -2,44 +2,43 @@
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Lien court MESURE vers la page demo.
+<!-- Le lien propre du mail. Adresse courte, domaine de Tony, aucun parametre :
+     c'est elle qui s'affiche dans le message.
 
-     Ce qu'il apporte : le clic depuis le mail est enregistre AVANT la
-     redirection. Les mails du 10/09 pointaient droit sur /demo-video/<slug>/,
-     et le clic n'etait mesure nulle part — on ne savait donc pas distinguer
-     « personne n'a ouvert le mail » de « personne n'a clique ».
+     Le clic est note DEUX fois, et c'est voulu :
 
-     CE QU'IL N'APPORTE PAS, contrairement a ce que j'ai d'abord ecrit ici le
-     2026-09-24 : il n'empeche pas Gmail d'envelopper l'adresse dans son
-     redirecteur google.com/url?q=... Verifie sur capture le meme jour — Gmail
-     enveloppe TOUS les liens, avec ou sans point d'interrogation. L'absence
-     de parametre reste preferable (adresse courte et lisible dans les clients
-     qui n'enveloppent pas), mais ce n'est pas une parade.
+     1. Cote serveur, en faisant passer le visiteur par le tracker que Tony a
+        construit en juin (workflow « Email tracking resto », webhook
+        email-tracking) : il journalise dans son Google Sheet puis rend un 302
+        vers la page demo. Cette voie ne depend d'aucun JavaScript — elle
+        marche meme si le navigateur bloque tout.
+     2. Cote table n8n SuiviDemoResto, par sendBeacon, pour que le tunnel
+        (clic-mail / ouverture / lecture-video / clic-tester) se lise d'un seul
+        tenant au meme endroit.
 
-     Le slug est ecrit en dur ici, jamais lu dans l'URL : pas de parametre,
-     donc rien a assainir. -->
+     Le corps du beacon part en URLSearchParams, PAS en JSON : un sendBeacon
+     inter-domaines en application/json n'est pas une requete « simple », le
+     navigateur exige un controle prealable que sendBeacon ne sait pas faire,
+     et Chrome abandonne EN SILENCE en renvoyant quand meme true. Mesure du
+     2026-09-24 : quatre beacons emis, ERR_FAILED sur les quatre, zero
+     execution cote n8n. text/plain traverse mais n8n livre alors le corps en
+     chaine brute et le noeud ecrit des null. -->
 <title>Vos publications — Food Boost</title>
 <style>body{background:#0b0b0d;color:#edeff1;font:400 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;
 display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;padding:24px;text-align:center}
 a{color:#f0a500}</style></head>
 <body><p>Un instant, on ouvre vos publications…<br>
-<a id="d" href="/demo-video/coffee-and-travel-974/">Ouvrir maintenant</a></p>
+<a id="d" href="https://resto.automatisationboost.com/demo-video/coffee-and-travel-974/">Ouvrir maintenant</a></p>
 <script>
 (function(){
-  var D='/demo-video/coffee-and-travel-974/';
-  // Le corps part en URLSearchParams, PAS en JSON. Ce n'est pas un detail de
-  // style : un sendBeacon inter-domaines avec Content-Type application/json
-  // n'est pas une requete « simple », le navigateur exige un controle
-  // prealable, et sendBeacon ne sait pas en faire. Chrome abandonne alors
-  // l'envoi EN SILENCE — et sendBeacon renvoie quand meme true, donc rien
-  // n'alerte. Mesure du 2026-09-24 : quatre beacons partis du navigateur,
-  // ERR_FAILED sur chacun, zero execution cote n8n.
-  // text/plain passe le reseau mais n8n livre alors le corps en CHAINE BRUTE
-  // et le mapping du noeud ecrit des null (verifie le meme jour).
-  // URLSearchParams est la seule forme qui traverse ET que n8n sait relire.
-
+  var SLUG='coffee-and-travel-974';
+  var DEST='https://resto.automatisationboost.com/demo-video/coffee-and-travel-974/';
   try{navigator.sendBeacon('https://n7n.automatisationboost.com/webhook/demo-clic',
-    new URLSearchParams({restaurant:'coffee-and-travel-974',quoi:'clic-mail',source:'lien-court'}));}catch(e){}
-  setTimeout(function(){location.replace(D);},180);
+    new URLSearchParams({restaurant:SLUG,quoi:'clic-mail',source:'lien-court'}));}catch(e){}
+  var SUIVI='https://n7n.automatisationboost.com/webhook/email-tracking'
+    +'?event=click&id='+encodeURIComponent(SLUG)
+    +'&secteur=resto&redirect='+encodeURIComponent(DEST);
+  /* 180 ms : de quoi laisser partir le beacon, pas assez pour se voir. */
+  setTimeout(function(){location.replace(SUIVI);},180);
 })();
 </script></body></html>

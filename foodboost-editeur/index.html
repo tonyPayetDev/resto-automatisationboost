@@ -352,6 +352,7 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
             <option value="japonais">Japonais / poké</option>
             <option value="burger">Burger / grill</option>
             <option value="snack">Snack / sandwich</option>
+            <option value="jus">Bar à jus frais</option>
           </select>
         </label>
       </div>
@@ -419,7 +420,7 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
           semaine sans y revenir.</p>
       </div>
 
-      <label class="bascule">
+      <label class="bascule" id="bloc-auto">
         <input type="checkbox" id="auto" checked>
         <span><b>Programmer cette publication</b> — elle est réservée à la date et à l'heure
           choisies plus haut.
@@ -446,6 +447,15 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
       autocomplete="email" style="flex:1 1 220px;min-width:180px;background:#101018;border:1px solid var(--trait,#26262c);
       color:inherit;border-radius:9px;padding:11px 12px;font:inherit;font-size:14px">
     <button class="primaire" id="planifier">Programmer ces publications</button>
+    <!-- En mode DEMO (?src=demo), ce bouton-ci remplace « Programmer ». Tony,
+         le 2026-09-24 : « je ne veux pas ça maintenant dans la démo, juste la
+         personne voit la vidéo ou l'image au pire et puisse tester, c'est
+         tout. » Programmer ouvrait la fenêtre de confirmation, déclenchait
+         deux webhooks et renvoyait le restaurateur sur /planifie/ — trois
+         étapes de trop pour quelqu'un qui découvre l'outil. -->
+    <a class="primaire" id="ca-minteresse" hidden
+       style="text-decoration:none;display:none;align-items:center;justify-content:center"
+       target="_blank" rel="noopener">Ça m'intéresse, on en parle</a>
   </div>
   <!-- « Un petit truc en dessous » : le récapitulatif de ce qui part, collé au
        bouton, pour qu'on ne l'envoie jamais sans avoir vu la destination. -->
@@ -531,6 +541,13 @@ const FAMILLES = {
   snack: { photos:['06-snacking--samoussas','06-snacking--bonbons-piment','04-sandwich--wrap-poulet','04-sandwich--bagel-saumon','03-burger--frites-maison'],
     hooks:[['CHAUD,','TOUT DE SUITE.'],['LA PAUSE','QUI FAIT DU BIEN.'],['TU PRENDS QUOI',"AUJOURD'HUI ?"]],
     sig:['VITE FAIT.','BIEN FAIT.'], menu:[['Menu du jour',['Samoussas','Bouchons','Wrap poulet']],['À emporter',['Bagel saumon','Frites maison','Beignet']]] },
+  /* Bar à jus frais. La banque ne contient que 3 visuels de boisson
+     (12-boissons--jus-detox, 12-boissons--mocktail, 01-demo--food-ananas) :
+     les 5 emplacements en réutilisent donc deux. Générer 2 visuels de plus
+     (smoothie, jus vert) supprimerait la répétition. */
+  jus: { photos:['12-boissons--jus-detox','12-boissons--mocktail','01-demo--food-ananas','12-boissons--mocktail','12-boissons--jus-detox'],
+    hooks:[['PRESSÉ','CE MATIN.'],['ZÉRO SUCRE','AJOUTÉ.'],['TU BOIS QUOI',"AUJOURD'HUI ?"]],
+    sig:['LE FRAIS.',"RIEN D'AUTRE."], menu:[['Menu du jour',['Jus détox vitaminé','Mocktail fruits rouges','Ananas pressé']],['À emporter',['Smoothie mangue','Citronnade menthe','Jus vert gingembre']]] },
 };
 /* Le plan des 9 vignettes. « p » = index de photo, « r » = rôle.
    Les 4 tuiles à texte sont en 2, 4, 7 et 9 : dispersées, jamais en colonne —
@@ -733,6 +750,7 @@ const HASH_FAMILLE = {
   japonais: ['sushi', 'restaurantjaponais'],
   burger: ['burger', 'streetfood'],
   snack: ['snack', 'streetfood'],
+  jus: ['jusfrais', 'detox'],
 };
 const calculerTags = () => {
   const ville = sansAccent(document.getElementById('ville').value);
@@ -812,6 +830,58 @@ peindreTags();
 const dlg = document.getElementById('dlg');
 const dlgConf = document.getElementById('dlg-conf');
 
+/* ── Le mode DÉMO ──────────────────────────────────────────────────────────
+   `?src=demo` : le visiteur arrive du mail de démarchage, par la page vidéo.
+   Il découvre l'outil, il n'a rien à programmer. On enlève donc la
+   planification — la fenêtre de confirmation, les deux webhooks, le
+   récapitulatif /planifie/ — et on laisse une seule suite possible : dire que
+   ça l'intéresse. Le reste de l'éditeur (changer une photo, un titre, la
+   légende) marche exactement pareil : c'est ce qu'il vient essayer.
+
+   Hors démo, rien ne change : le parcours complet reste en place pour les
+   clients qui l'utilisent vraiment. */
+const MODE_DEMO = new URLSearchParams(location.search).get('src') === 'demo';
+if (MODE_DEMO) {
+  const bp = document.getElementById('planifier');
+  if (bp) bp.remove();
+  const em = document.getElementById('email-client');
+  if (em) em.remove();
+  const ci = document.getElementById('ca-minteresse');
+  if (ci) {
+    ci.hidden = false;
+    ci.style.display = 'inline-flex';
+    /* Le lien se remplit une fois E connu — au clic, pas au chargement :
+       le nom de l'établissement n'est pas encore lu à cette ligne. */
+    ci.addEventListener('click', (ev) => {
+      const qui = ((E && E.nom) || '').trim() || 'mon restaurant';
+      const ou = ((E && E.ville) || '').trim();
+      const msg = 'Bonjour Tony, je viens de tester FoodBoost avec les photos de ' + qui
+        + (ou ? ' (' + ou + ')' : '') + '. J\'aimerais en savoir plus.';
+      ci.href = 'https://wa.me/262692417749?text=' + encodeURIComponent(msg);
+      /* On note l'intention avant que l'onglet ne parte. URLSearchParams et
+         pas JSON : un sendBeacon inter-domaines en application/json est
+         abandonné en silence par le navigateur (mesuré le 2026-09-24). */
+      try {
+        navigator.sendBeacon('https://n7n.automatisationboost.com/webhook/demo-clic',
+          new URLSearchParams({
+            restaurant: new URLSearchParams(location.search).get('client') || '',
+            quoi: 'ca-minteresse', source: 'editeur-demo',
+          }));
+      } catch (e) {}
+      void ev;
+    });
+  }
+  const recap = document.getElementById('recap');
+  if (recap) recap.remove();
+  /* La case « Programmer cette publication » et le bouton « connecter mon
+     compte » appartiennent au parcours de planification : sans lui, ils
+     promettent une suite qui n'existe plus sur cette page. */
+  ['bloc-auto', 'demander-auto', 'auto-retour'].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+}
+
 /* ── La légende. Elle n'existait pas : on envoyait une composition sans texte,
       donc rien de publiable. Elle est proposée, puis modifiable — et dès qu'on
       y touche, elle n'est plus réécrite sous les doigts. ─────────────────── */
@@ -821,6 +891,7 @@ const LEG_FAMILLE = {
   japonais: 'La carte du jour, coupée à la minute.',
   burger: 'La carte du jour, au grill.',
   snack: 'La carte du jour, à emporter.',
+  jus: 'La carte du jour, pressée à froid.',
 };
 let legendeTouchee = false;
 const legendeAuto = () => {
@@ -939,7 +1010,11 @@ if (boutonAuto) boutonAuto.addEventListener('click', function (ev) {
   }).then(function () { boutonAuto.style.pointerEvents = ''; });
 });
 
-document.getElementById('planifier').addEventListener('click', () => {
+/* En mode démo ce bouton n'existe plus. Sans ce garde, la ligne jetterait
+   « Cannot read properties of null » et TOUT le script s'arrêterait là —
+   y compris l'éditeur que le visiteur vient précisément essayer. */
+const btnPlanifier = document.getElementById('planifier');
+if (btnPlanifier) btnPlanifier.addEventListener('click', () => {
   if (selection === null) {
     alert('Touchez la vignette que vous voulez publier : c\'est cette publication-là qui part, pas tout le feed.');
     return;

@@ -156,6 +156,21 @@ Faites avec vos propres photos. Rien n'a été publié.
 
   </table>
 </td></tr></table>
+
+<!-- Le pixel d'ouverture. Il appelle le tracker que Tony a construit en juin
+     (workflow « Email tracking resto ») : sur event=open, celui-ci journalise
+     dans son Google Sheet et rend un GIF transparent de 1x1.
+
+     C'est ce qui remplit la colonne « ouverts » restee vide depuis le 10/09 :
+     Gmail n'a pas de pixel, on n'a donc JAMAIS su combien de restaurateurs
+     avaient ouvert le message — seulement combien avaient ouvert la page.
+
+     A lire avec prudence : beaucoup de clients bloquent les images par defaut,
+     et Gmail les sert via son propre cache, ce qui peut compter une ouverture
+     que personne n'a faite. Un taux d'ouverture est une tendance, jamais un
+     decompte. -->
+<img src="https://n7n.automatisationboost.com/webhook/email-tracking?event=open&amp;id=${encodeURIComponent(slug)}&amp;secteur=resto"
+     width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0;">
 </body></html>`;
 }
 
