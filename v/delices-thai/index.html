@@ -2,19 +2,19 @@
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Lien court TRACE vers la page demo.
+<!-- Lien court MESURE vers la page demo.
 
-     Deux raisons d'exister, toutes deux payees le 2026-09-10 :
+     Ce qu'il apporte : le clic depuis le mail est enregistre AVANT la
+     redirection. Les mails du 10/09 pointaient droit sur /demo-video/<slug>/,
+     et le clic n'etait mesure nulle part — on ne savait donc pas distinguer
+     « personne n'a ouvert le mail » de « personne n'a clique ».
 
-     1. Gmail enveloppe toute adresse portant un « ? » dans son ecran
-        « Avertissement de redirection ». Le mail du Nautile est parti avec
-        .../demo-video/le-nautile-beach-hotel/?s=mail et le destinataire a vu
-        une URL google.com/url?q=... a rallonge, pas le domaine de Tony.
-        Cette page n'a aucun parametre : elle passe droit.
-
-     2. Le clic sur le lien du mail n'etait mesure nulle part. Le beacon
-        ci-dessous le note AVANT la redirection — sendBeacon survit au
-        changement de page, un fetch() non.
+     CE QU'IL N'APPORTE PAS, contrairement a ce que j'ai d'abord ecrit ici le
+     2026-09-24 : il n'empeche pas Gmail d'envelopper l'adresse dans son
+     redirecteur google.com/url?q=... Verifie sur capture le meme jour — Gmail
+     enveloppe TOUS les liens, avec ou sans point d'interrogation. L'absence
+     de parametre reste preferable (adresse courte et lisible dans les clients
+     qui n'enveloppent pas), mais ce n'est pas une parade.
 
      Le slug est ecrit en dur ici, jamais lu dans l'URL : pas de parametre,
      donc rien a assainir. -->
