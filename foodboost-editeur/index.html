@@ -453,8 +453,14 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
          tout. » Programmer ouvrait la fenêtre de confirmation, déclenchait
          deux webhooks et renvoyait le restaurateur sur /planifie/ — trois
          étapes de trop pour quelqu'un qui découvre l'outil. -->
+    <!-- `padding` et `flex` explicites : la barre est en flex, et sans eux le
+         lien s'etirait sur toute la largeur en collant son texte au bord
+         gauche de l'ecran (vu sur capture en 390 px le 2026-09-24). Un bouton
+         herite des styles de `.primaire`, mais pas de la geometrie que le
+         <button> voisin tenait de l'agent utilisateur. -->
     <a class="primaire" id="ca-minteresse" hidden
-       style="text-decoration:none;display:none;align-items:center;justify-content:center"
+       style="text-decoration:none;display:none;align-items:center;justify-content:center;
+              text-align:center;padding:13px 20px;flex:1 1 220px;min-width:200px"
        target="_blank" rel="noopener">Ça m'intéresse, on en parle</a>
   </div>
   <!-- « Un petit truc en dessous » : le récapitulatif de ce qui part, collé au
