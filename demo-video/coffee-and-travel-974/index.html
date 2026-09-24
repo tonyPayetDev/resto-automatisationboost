@@ -36,8 +36,7 @@ Vous ne voulez plus de messages de ma part ? Répondez « stop » à l'email, je
 <script>
 // Suivi minimal : une ouverture, un clic. Aucun cookie, aucun tiers.
 var P="https://n7n.automatisationboost.com/webhook/demo-clic";
-function dire(q){try{navigator.sendBeacon(P,new Blob([JSON.stringify(
-  {restaurant:"coffee-and-travel-974",quoi:q,source:location.search.replace("?","")})],{type:"application/json"}));}catch(e){}}
+function dire(q){try{navigator.sendBeacon(P,new URLSearchParams({restaurant:"coffee-and-travel-974",quoi:q,source:location.search.replace("?","")}));}catch(e){}}
 dire("ouverture");
 document.getElementById("tester").addEventListener("click",function(){dire("clic-tester");});
 var vu=false;

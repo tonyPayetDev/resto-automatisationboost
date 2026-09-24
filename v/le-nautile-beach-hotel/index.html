@@ -27,9 +27,19 @@ a{color:#f0a500}</style></head>
 <script>
 (function(){
   var D='/demo-video/le-nautile-beach-hotel/';
+  // Le corps part en URLSearchParams, PAS en JSON. Ce n'est pas un detail de
+  // style : un sendBeacon inter-domaines avec Content-Type application/json
+  // n'est pas une requete « simple », le navigateur exige un controle
+  // prealable, et sendBeacon ne sait pas en faire. Chrome abandonne alors
+  // l'envoi EN SILENCE — et sendBeacon renvoie quand meme true, donc rien
+  // n'alerte. Mesure du 2026-09-24 : quatre beacons partis du navigateur,
+  // ERR_FAILED sur chacun, zero execution cote n8n.
+  // text/plain passe le reseau mais n8n livre alors le corps en CHAINE BRUTE
+  // et le mapping du noeud ecrit des null (verifie le meme jour).
+  // URLSearchParams est la seule forme qui traverse ET que n8n sait relire.
+
   try{navigator.sendBeacon('https://n7n.automatisationboost.com/webhook/demo-clic',
-    new Blob([JSON.stringify({restaurant:'le-nautile-beach-hotel',quoi:'clic-mail',source:'lien-court'})],
-    {type:'application/json'}));}catch(e){}
+    new URLSearchParams({restaurant:'le-nautile-beach-hotel',quoi:'clic-mail',source:'lien-court'}));}catch(e){}
   setTimeout(function(){location.replace(D);},180);
 })();
 </script></body></html>
