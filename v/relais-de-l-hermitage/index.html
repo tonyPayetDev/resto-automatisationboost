@@ -2,27 +2,33 @@
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Le lien propre du mail. Adresse courte, domaine de Tony, aucun parametre :
-     c'est elle qui s'affiche dans le message.
+<!-- Le lien propre du mail : adresse courte, domaine de Tony, aucun parametre.
 
-     Le clic est note DEUX fois, et c'est voulu :
+     Le clic part vers DEUX destinations, et le visiteur n'attend ni l'une ni
+     l'autre :
 
-     1. Cote serveur, en faisant passer le visiteur par le tracker que Tony a
-        construit en juin (workflow « Email tracking resto », webhook
-        email-tracking) : il journalise dans son Google Sheet puis rend un 302
-        vers la page demo. Cette voie ne depend d'aucun JavaScript — elle
-        marche meme si le navigateur bloque tout.
-     2. Cote table n8n SuiviDemoResto, par sendBeacon, pour que le tunnel
-        (clic-mail / ouverture / lecture-video / clic-tester) se lise d'un seul
-        tenant au meme endroit.
+     . le tracker de Tony (workflow « Email tracking resto », juin), qui
+       journalise dans son Google Sheet ;
+     . la table n8n SuiviDemoResto, pour lire le tunnel d'un seul tenant
+       (clic-mail / ouverture / lecture-video / clic-tester).
+
+     POURQUOI ON NE FAIT PAS TRANSITER LE VISITEUR PAR LE 302 DU TRACKER :
+     mesure du 2026-09-24, le webhook rend son 302 en 1,2 a 2,0 secondes. Sur
+     un lien de demarchage, ce sont deux secondes d'ecran blanc avant la
+     video, payees par le seul prospect qui avait accepte de cliquer. On
+     envoie donc la requete avec `keepalive`, fait exactement pour ca : le
+     navigateur la mene a terme MEME si la page a deja change. Le visiteur
+     part tout de suite, la ligne s'ecrit quand meme.
+
+     `mode:'no-cors'` : on n'a pas besoin de LIRE la reponse, seulement de
+     l'envoyer. Sans lui, l'absence d'en-tetes CORS ferait echouer l'appel.
 
      Le corps du beacon part en URLSearchParams, PAS en JSON : un sendBeacon
      inter-domaines en application/json n'est pas une requete « simple », le
      navigateur exige un controle prealable que sendBeacon ne sait pas faire,
      et Chrome abandonne EN SILENCE en renvoyant quand meme true. Mesure du
-     2026-09-24 : quatre beacons emis, ERR_FAILED sur les quatre, zero
-     execution cote n8n. text/plain traverse mais n8n livre alors le corps en
-     chaine brute et le noeud ecrit des null. -->
+     meme jour : quatre beacons emis, ERR_FAILED sur les quatre, zero
+     execution cote n8n. -->
 <title>Vos publications — Food Boost</title>
 <style>body{background:#0b0b0d;color:#edeff1;font:400 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;
 display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;padding:24px;text-align:center}
@@ -35,10 +41,11 @@ a{color:#f0a500}</style></head>
   var DEST='https://resto.automatisationboost.com/demo-video/relais-de-l-hermitage/';
   try{navigator.sendBeacon('https://n7n.automatisationboost.com/webhook/demo-clic',
     new URLSearchParams({restaurant:SLUG,quoi:'clic-mail',source:'lien-court'}));}catch(e){}
-  var SUIVI='https://n7n.automatisationboost.com/webhook/email-tracking'
-    +'?event=click&id='+encodeURIComponent(SLUG)
-    +'&secteur=resto&redirect='+encodeURIComponent(DEST);
-  /* 180 ms : de quoi laisser partir le beacon, pas assez pour se voir. */
-  setTimeout(function(){location.replace(SUIVI);},180);
+  try{
+    fetch('https://n7n.automatisationboost.com/webhook/email-tracking'
+      +'?event=click&id='+encodeURIComponent(SLUG)+'&secteur=resto',
+      {mode:'no-cors',keepalive:true,credentials:'omit'});
+  }catch(e){}
+  setTimeout(function(){location.replace(DEST);},150);
 })();
 </script></body></html>
