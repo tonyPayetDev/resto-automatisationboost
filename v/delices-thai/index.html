@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Lien court TRACE vers la page demo.
+
+     Deux raisons d'exister, toutes deux payees le 2026-09-10 :
+
+     1. Gmail enveloppe toute adresse portant un « ? » dans son ecran
+        « Avertissement de redirection ». Le mail du Nautile est parti avec
+        .../demo-video/le-nautile-beach-hotel/?s=mail et le destinataire a vu
+        une URL google.com/url?q=... a rallonge, pas le domaine de Tony.
+        Cette page n'a aucun parametre : elle passe droit.
+
+     2. Le clic sur le lien du mail n'etait mesure nulle part. Le beacon
+        ci-dessous le note AVANT la redirection — sendBeacon survit au
+        changement de page, un fetch() non.
+
+     Le slug est ecrit en dur ici, jamais lu dans l'URL : pas de parametre,
+     donc rien a assainir. -->
+<title>Vos publications — Food Boost</title>
+<style>body{background:#0b0b0d;color:#edeff1;font:400 16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;
+display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0;padding:24px;text-align:center}
+a{color:#f0a500}</style></head>
+<body><p>Un instant, on ouvre vos publications…<br>
+<a id="d" href="/demo-video/delices-thai/">Ouvrir maintenant</a></p>
+<script>
+(function(){
+  var D='/demo-video/delices-thai/';
+  try{navigator.sendBeacon('https://n7n.automatisationboost.com/webhook/demo-clic',
+    new Blob([JSON.stringify({restaurant:'delices-thai',quoi:'clic-mail',source:'lien-court'})],
+    {type:'application/json'}));}catch(e){}
+  setTimeout(function(){location.replace(D);},180);
+})();
+</script></body></html>
