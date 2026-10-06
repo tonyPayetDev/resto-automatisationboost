@@ -219,5 +219,189 @@
    "../demo/arbradelis/photos/plat5.jpg",
    "../demo/arbradelis/photos/plat6.jpg"
   ]
+ },
+ "restaurant-coulee-77": {
+  "nom": "Restaurant Coulée 77",
+  "source": "boutique-restaurant-coulee77.com",
+  "ville": "Sainte-Rose",
+  "photos": [
+   "../demo/restaurant-coulee-77/photos/plat01.jpg",
+   "../demo/restaurant-coulee-77/photos/plat02.jpg",
+   "../demo/restaurant-coulee-77/photos/plat03.jpg",
+   "../demo/restaurant-coulee-77/photos/plat04.jpg",
+   "../demo/restaurant-coulee-77/photos/plat05.jpg",
+   "../demo/restaurant-coulee-77/photos/plat06.jpg",
+   "../demo/restaurant-coulee-77/photos/plat07.jpg",
+   "../demo/restaurant-coulee-77/photos/plat08.jpg",
+   "../demo/restaurant-coulee-77/photos/lieu01.jpg",
+   "../demo/restaurant-coulee-77/photos/lieu02.jpg",
+   "../demo/restaurant-coulee-77/photos/lieu03.jpg",
+   "../demo/restaurant-coulee-77/photos/lieu04.jpg"
+  ]
+ },
+ "le-tamareo": {
+  "nom": "Le Tamaréo",
+  "source": "letamareo.re",
+  "ville": "Mafate",
+  "photos": [
+   "../demo/le-tamareo/photos/plat01.jpg",
+   "../demo/le-tamareo/photos/plat02.jpg",
+   "../demo/le-tamareo/photos/plat03.jpg",
+   "../demo/le-tamareo/photos/plat04.jpg",
+   "../demo/le-tamareo/photos/plat05.jpg",
+   "../demo/le-tamareo/photos/plat06.jpg",
+   "../demo/le-tamareo/photos/plat07.jpg",
+   "../demo/le-tamareo/photos/lieu01.jpg",
+   "../demo/le-tamareo/photos/lieu02.jpg",
+   "../demo/le-tamareo/photos/lieu03.jpg",
+   "../demo/le-tamareo/photos/lieu04.jpg",
+   "../demo/le-tamareo/photos/lieu05.jpg",
+   "../demo/le-tamareo/photos/lieu06.jpg"
+  ]
+ },
+ "au-vieux-quimper": {
+  "nom": "Au Vieux Quimper",
+  "source": "auvieuxquimper.com",
+  "ville": "Saint-Paul",
+  "photos": [
+   "../demo/au-vieux-quimper/photos/plat01.jpg",
+   "../demo/au-vieux-quimper/photos/plat02.jpg",
+   "../demo/au-vieux-quimper/photos/plat03.jpg",
+   "../demo/au-vieux-quimper/photos/plat04.jpg",
+   "../demo/au-vieux-quimper/photos/plat05.jpg",
+   "../demo/au-vieux-quimper/photos/plat06.jpg",
+   "../demo/au-vieux-quimper/photos/plat07.jpg",
+   "../demo/au-vieux-quimper/photos/plat08.jpg",
+   "../demo/au-vieux-quimper/photos/plat09.jpg",
+   "../demo/au-vieux-quimper/photos/plat10.jpg",
+   "../demo/au-vieux-quimper/photos/plat11.jpg",
+   "../demo/au-vieux-quimper/photos/plat12.jpg",
+   "../demo/au-vieux-quimper/photos/lieu01.jpg",
+   "../demo/au-vieux-quimper/photos/lieu02.jpg"
+  ]
+ },
+ "la-parenthese-latitude-21": {
+  "nom": "La Parenthèse · Latitude 21",
+  "source": "latitude21.re",
+  "ville": "Saint-Paul",
+  "photos": [
+   "../demo/la-parenthese-latitude-21/photos/plat01.jpg",
+   "../demo/la-parenthese-latitude-21/photos/plat02.jpg",
+   "../demo/la-parenthese-latitude-21/photos/plat03.jpg",
+   "../demo/la-parenthese-latitude-21/photos/plat04.jpg",
+   "../demo/la-parenthese-latitude-21/photos/plat05.jpg",
+   "../demo/la-parenthese-latitude-21/photos/plat06.jpg",
+   "../demo/la-parenthese-latitude-21/photos/lieu01.jpg",
+   "../demo/la-parenthese-latitude-21/photos/lieu02.jpg",
+   "../demo/la-parenthese-latitude-21/photos/lieu03.jpg",
+   "../demo/la-parenthese-latitude-21/photos/lieu04.jpg"
+  ]
+ },
+ "le-debarcadere": {
+  "nom": "Le Débarcadère",
+  "source": "ledebarcadere.re",
+  "ville": "Saint-Paul",
+  "photos": [
+   "../demo/le-debarcadere/photos/plat01.jpg",
+   "../demo/le-debarcadere/photos/plat02.jpg",
+   "../demo/le-debarcadere/photos/plat03.jpg",
+   "../demo/le-debarcadere/photos/plat04.jpg",
+   "../demo/le-debarcadere/photos/plat05.jpg",
+   "../demo/le-debarcadere/photos/plat06.jpg",
+   "../demo/le-debarcadere/photos/lieu01.jpg",
+   "../demo/le-debarcadere/photos/lieu02.jpg",
+   "../demo/le-debarcadere/photos/lieu03.jpg"
+  ]
+ },
+ "le-long-board": {
+  "nom": "Le Long Board",
+  "source": "lelongboard.com",
+  "ville": "Le Tampon",
+  "photos": [
+   "../demo/le-long-board/photos/plat01.jpg",
+   "../demo/le-long-board/photos/plat02.jpg",
+   "../demo/le-long-board/photos/plat03.jpg",
+   "../demo/le-long-board/photos/plat04.jpg",
+   "../demo/le-long-board/photos/lieu01.jpg",
+   "../demo/le-long-board/photos/lieu02.jpg",
+   "../demo/le-long-board/photos/lieu03.jpg",
+   "../demo/le-long-board/photos/lieu04.jpg",
+   "../demo/le-long-board/photos/lieu05.jpg",
+   "../demo/le-long-board/photos/lieu06.jpg"
+  ]
+ },
+ "ti-mahi-mahi": {
+  "nom": "Ti Mahi Mahi",
+  "source": "letimahimahi.com",
+  "ville": "Saint-Paul",
+  "photos": [
+   "../demo/ti-mahi-mahi/photos/plat01.jpg",
+   "../demo/ti-mahi-mahi/photos/plat02.jpg",
+   "../demo/ti-mahi-mahi/photos/plat03.jpg",
+   "../demo/ti-mahi-mahi/photos/plat04.jpg",
+   "../demo/ti-mahi-mahi/photos/plat05.jpg",
+   "../demo/ti-mahi-mahi/photos/plat06.jpg",
+   "../demo/ti-mahi-mahi/photos/plat07.jpg",
+   "../demo/ti-mahi-mahi/photos/plat08.jpg",
+   "../demo/ti-mahi-mahi/photos/lieu01.jpg",
+   "../demo/ti-mahi-mahi/photos/lieu02.jpg",
+   "../demo/ti-mahi-mahi/photos/lieu03.jpg",
+   "../demo/ti-mahi-mahi/photos/lieu04.jpg"
+  ]
+ },
+ "l-auberge-creole": {
+  "nom": "L'Auberge Créole",
+  "source": "laubergecreole.re",
+  "ville": "Saint-Benoît",
+  "photos": [
+   "../demo/l-auberge-creole/photos/plat01.jpg",
+   "../demo/l-auberge-creole/photos/plat02.jpg",
+   "../demo/l-auberge-creole/photos/plat03.jpg",
+   "../demo/l-auberge-creole/photos/plat04.jpg",
+   "../demo/l-auberge-creole/photos/plat05.jpg",
+   "../demo/l-auberge-creole/photos/lieu01.jpg",
+   "../demo/l-auberge-creole/photos/lieu02.jpg",
+   "../demo/l-auberge-creole/photos/lieu03.jpg",
+   "../demo/l-auberge-creole/photos/lieu04.jpg",
+   "../demo/l-auberge-creole/photos/lieu05.jpg"
+  ]
+ },
+ "la-toque-merveilleuse": {
+  "nom": "La Toque Merveilleuse",
+  "source": "latoquemerveilleuse.re",
+  "ville": "Saint-Paul",
+  "photos": [
+   "../demo/la-toque-merveilleuse/photos/plat01.jpg",
+   "../demo/la-toque-merveilleuse/photos/plat02.jpg",
+   "../demo/la-toque-merveilleuse/photos/plat03.jpg",
+   "../demo/la-toque-merveilleuse/photos/plat04.jpg",
+   "../demo/la-toque-merveilleuse/photos/plat05.jpg",
+   "../demo/la-toque-merveilleuse/photos/plat06.jpg",
+   "../demo/la-toque-merveilleuse/photos/plat07.jpg",
+   "../demo/la-toque-merveilleuse/photos/plat08.jpg",
+   "../demo/la-toque-merveilleuse/photos/plat09.jpg",
+   "../demo/la-toque-merveilleuse/photos/lieu01.jpg",
+   "../demo/la-toque-merveilleuse/photos/lieu02.jpg",
+   "../demo/la-toque-merveilleuse/photos/lieu03.jpg"
+  ]
+ },
+ "kassis-patisserie": {
+  "nom": "Kassis Pâtisserie",
+  "source": "kassis-patisserie.fr",
+  "ville": "Saint-Pierre",
+  "photos": [
+   "../demo/kassis-patisserie/photos/plat01.jpg",
+   "../demo/kassis-patisserie/photos/plat02.jpg",
+   "../demo/kassis-patisserie/photos/plat03.jpg",
+   "../demo/kassis-patisserie/photos/plat04.jpg",
+   "../demo/kassis-patisserie/photos/plat05.jpg",
+   "../demo/kassis-patisserie/photos/plat06.jpg",
+   "../demo/kassis-patisserie/photos/plat07.jpg",
+   "../demo/kassis-patisserie/photos/plat08.jpg",
+   "../demo/kassis-patisserie/photos/plat09.jpg",
+   "../demo/kassis-patisserie/photos/plat10.jpg",
+   "../demo/kassis-patisserie/photos/plat11.jpg",
+   "../demo/kassis-patisserie/photos/plat12.jpg"
+  ]
  }
 }
