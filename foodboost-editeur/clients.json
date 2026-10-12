@@ -403,5 +403,22 @@
    "../demo/kassis-patisserie/photos/plat11.jpg",
    "../demo/kassis-patisserie/photos/plat12.jpg"
   ]
+ },
+ "befresh": {
+  "nom": "BE FRESH",
+  "ville": "Saint-Paul",
+  "famille": "jus",
+  "source": "instagram.com/befresh.events",
+  "photos": [
+   "../demo/befresh/photos/p01.jpg",
+   "../demo/befresh/photos/p02.jpg",
+   "../demo/befresh/photos/p03.jpg",
+   "../demo/befresh/photos/p04.jpg",
+   "../demo/befresh/photos/p05.jpg",
+   "../demo/befresh/photos/p06.jpg",
+   "../demo/befresh/photos/p07.jpg",
+   "../demo/befresh/photos/p08.jpg",
+   "../demo/befresh/photos/p09.jpg"
+  ]
  }
 }
