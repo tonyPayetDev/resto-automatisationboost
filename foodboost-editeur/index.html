@@ -302,6 +302,11 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
   /* Le lien « publication automatique » debordait sur deux lignes collees. */
   .destination a,.suite a{overflow-wrap:anywhere;line-height:1.5}
 }
+.style-vignette{flex:0 0 132px;display:grid;gap:6px;background:#15181c;border:2px solid #2a2f35;border-radius:10px;padding:6px;color:#EDEFF1;font:600 12px/1.2 system-ui,sans-serif;cursor:pointer;text-align:left}
+.style-vignette img{width:100%;aspect-ratio:9/16;object-fit:cover;border-radius:7px;display:block}
+.style-vignette.choisi{border-color:var(--ui-vif,#FF8A2B)}
+.style-vignette:focus-visible{outline:2px solid var(--ui-vif,#FF8A2B);outline-offset:2px}
+#styles-video{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
@@ -381,6 +386,17 @@ button.petit{min-height:38px;padding:0 14px;font-size:.82rem}
       <div class="banque" id="banque"></div>
     </div>
     </div>
+    </div>
+
+    <div class="bloc" id="bloc-style">
+      <h3>Style vidéo</h3>
+      <p class="aide">Choisis le style de la vidéo. Les 4 styles montrés sont des exemples faits pour BeFresh : le vrai rendu prendra les photos du restaurant.</p>
+      <div class="sto" id="styles-video" role="radiogroup" aria-label="Style vidéo"></div>
+      <div class="rangee" style="margin-top:14px">
+        <label>Reprendre le style d'une vidéo : envoie le fichier<input type="file" id="ref-fichier" accept="video/*"></label>
+        <label>ou colle l'adresse d'une vidéo (reel, TikTok)<input type="url" id="ref-url" placeholder="https://..."></label>
+      </div>
+      <p class="aide" id="ref-etat"></p>
     </div>
 
     <div class="bloc" id="bloc-envoi">
@@ -589,10 +605,13 @@ function neuf(famille) {
     hooks: F.hooks.map((h) => h.slice()),
     sig: F.sig.slice(),
     menu: F.menu.map(([t, l]) => [t, l.slice()]),
+    style: 'beat-sync',
   };
 }
 
 function peindre() {
+  if (!E.style) E.style = 'beat-sync';
+  peindreStyles();
   const P = PALETTES[E.ambiance];
   for (const [k, v] of Object.entries(P)) document.documentElement.style.setProperty('--' + k, v);
   document.getElementById('v-nom').textContent = E.nom || '—';
@@ -953,6 +972,60 @@ if (champAuto) {
 }
 
 /* ── Le récapitulatif sous le bouton ──────────────────────────────────── */
+/* ── Style vidéo : exemples de styles produits (BeFresh), un choix par restaurant. */
+const STYLES_VIDEO = [
+  { id: 'beat-sync', nom: 'Beat sync', image: 'styles/beat-sync.jpg' },
+  { id: 'montage-bar', nom: 'Montage bar', image: 'styles/montage-bar.jpg' },
+  { id: 'montage-q3', nom: 'Montage trimestre', image: 'styles/montage-q3.jpg' },
+  { id: 'mojito', nom: 'Mojito', image: 'styles/mojito.jpg' },
+];
+
+function peindreStyles() {
+  const z = document.getElementById('styles-video');
+  if (!z || !E) return;
+  z.innerHTML = '';
+  for (const st of STYLES_VIDEO) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'style-vignette' + (E.style === st.id ? ' choisi' : '');
+    b.setAttribute('role', 'radio');
+    b.setAttribute('aria-checked', E.style === st.id ? 'true' : 'false');
+    b.innerHTML = '<img src="' + st.image + '" alt="' + st.nom + '" loading="lazy"><span>' + st.nom + '</span>';
+    b.addEventListener('click', () => { E.style = st.id; modifs++; peindreStyles(); peindreRecap(); });
+    z.appendChild(b);
+  }
+}
+
+/* ── Référence : une vidéo envoyée ou une adresse à reprendre. L'analyse du style n'est pas encore automatique : on garde la référence pour la fabrication. */
+function enregistrerReference(ref, texte) {
+  if (!E) return;
+  E.reference = ref;
+  modifs++;
+  const z = document.getElementById('ref-etat');
+  if (z) z.textContent = texte;
+  peindreRecap();
+}
+(function brancherReference() {
+  const f = document.getElementById('ref-fichier');
+  const u = document.getElementById('ref-url');
+  if (f) f.addEventListener('change', () => {
+    const fichier = f.files && f.files[0];
+    if (!fichier) return;
+    enregistrerReference({ type: 'fichier', nom: fichier.name, taille: fichier.size },
+      'Vidéo reçue : ' + fichier.name + '. Elle servira de référence de style ; le rendu sera vérifié avant publication.');
+  });
+  if (u) u.addEventListener('change', () => {
+    const adresse = u.value.trim();
+    if (!/^https?:\/\//.test(adresse)) {
+      const z = document.getElementById('ref-etat');
+      if (z) z.textContent = 'Colle une adresse qui commence par https://';
+      return;
+    }
+    enregistrerReference({ type: 'url', adresse },
+      'Adresse reçue. Elle servira de référence de style ; le rendu sera vérifié avant publication.');
+  });
+})();
+
 function peindreRecap() {
   const z = document.getElementById('recap-txt');
   if (!z) return;
@@ -960,9 +1033,11 @@ function peindreRecap() {
   if (v && E) v.src = url(E.photos[0]);
   const quand = (document.getElementById('d-quand') || {}).textContent || 'créneau non choisi';
   const n = calculerTags().length;
+  const st = STYLES_VIDEO.find((x) => x.id === (E && E.style));
+  const styleTxt = (st ? ' · style <b>' + st.nom + '</b>' : '') + (E && E.reference ? ' · référence reçue' : '');
   const debut = (champLegende ? champLegende.value : '').trim().split('\n')[0] || '(légende vide)';
   /* On nomme la démonstration au lieu de laisser croire que ça part chez lui. */
-  z.innerHTML = 'Part sur <b>@foodboost</b> <span style="opacity:.7">(notre compte de démonstration)</span> · reel 9:16 · <b>' + quand.replace(' — heure de La Réunion.', '') + '</b><br>'
+  z.innerHTML = 'Part sur <b>@foodboost</b> <span style="opacity:.7">(notre compte de démonstration)</span> · reel 9:16 · <b>' + quand.replace(' — heure de La Réunion.', '') + '</b>' + styleTxt + '<br>'
     + '« ' + debut.slice(0, 46) + (debut.length > 46 ? '…' : '') + ' » · ' + n + ' hashtags · '
     + (modeAuto() ? '<b>publication automatique</b>' : 'relecture de Tony avant publication');
 }
